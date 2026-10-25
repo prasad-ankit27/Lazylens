@@ -2545,10 +2545,10 @@ export default function Home() {
 
                 {/* ── Right Contextual Inspector ─────────────────────────── */}
                 <aside className="right-inspector" style={{ width: 300 }}>
-                  {/* Tabs: Edit, Layers, AI Tools */}
+                  {/* Tabs: Edit, AI Tools */}
                   <div className="inspector-nav-tabs">
-                    {(["edit", "layers", "ai"] as const).map((tab) => {
-                      const labels = { edit: "Edit", layers: `Layers (${unifiedLayers.length})`, ai: "AI Tools" };
+                    {(["edit", "ai"] as const).map((tab) => {
+                      const labels = { edit: "Edit", ai: "AI Tools" };
                       return (
                         <button
                           key={tab}
