@@ -249,6 +249,8 @@ export default function Home() {
   const [canvasTool, setCanvasTool] = useState<"select" | "move" | "crop" | "rotate" | "flip" | "fit" | "fill" | "text">("select");
   const [isTextPanelOpen, setIsTextPanelOpen] = useState<boolean>(true);
   const [showAllFilters, setShowAllFilters] = useState<boolean>(false);
+  const [deleteConfirmSlideIndex, setDeleteConfirmSlideIndex] = useState<number | null>(null);
+  const [isDeletingSlide, setIsDeletingSlide] = useState<boolean>(false);
 
   // Canvas View Controls
   const [zoomLevel, setZoomLevel] = useState<number>(100);
@@ -652,19 +654,77 @@ export default function Home() {
     showToast("Duplicated slide");
   };
 
-  const handleDeleteSlide = (idx: number) => {
-    if (slides.length <= 1) {
-      showToast("Cannot delete the only slide");
-      return;
-    }
-    setSlides((prev) => {
-      const next = prev.filter((_, i) => i !== idx);
-      pushHistory(next);
-      return next;
-    });
-    setActiveSlideIndex((prev) => Math.max(0, prev - 1));
-    showToast("Deleted slide");
+  // Check if a slide contains edited content (text, stickers, custom photos, modified transforms)
+  const isSlideEdited = (slide?: CarouselSlide): boolean => {
+    if (!slide) return false;
+    const hasCustomPhotos = (slide.photos || []).some((p) => p.file !== null || p.isCustom);
+    const hasTextElements = (slide.textElements || []).length > 0;
+    const hasStickers = (slide.stickers || []).length > 0;
+    const hasCustomTransforms = (slide.transforms || []).some(
+      (t) =>
+        (t.scale !== undefined && t.scale !== 1.0) ||
+        (t.rotation !== undefined && t.rotation !== 0) ||
+        (t.brightness !== undefined && t.brightness !== 0) ||
+        (t.contrast !== undefined && t.contrast !== 0) ||
+        (t.saturation !== undefined && t.saturation !== 0) ||
+        (t.warmth !== undefined && t.warmth !== 0) ||
+        (t.filter && t.filter !== "none") ||
+        t.flip_h ||
+        t.flip_v
+    );
+    return hasCustomPhotos || hasTextElements || hasStickers || hasCustomTransforms;
   };
+
+  const promptDeleteSlide = (idx: number) => {
+    if (idx < 0 || idx >= slides.length) return;
+    setDeleteConfirmSlideIndex(idx);
+  };
+
+  const confirmDeleteSlide = () => {
+    if (deleteConfirmSlideIndex === null || isDeletingSlide) return;
+    setIsDeletingSlide(true);
+
+    const idxToDelete = deleteConfirmSlideIndex;
+    const nextSlides = slides.filter((_, i) => i !== idxToDelete);
+
+    let nextActiveIndex = activeSlideIndex;
+    if (nextSlides.length === 0) {
+      nextActiveIndex = 0;
+    } else if (idxToDelete === activeSlideIndex) {
+      nextActiveIndex = Math.min(idxToDelete, nextSlides.length - 1);
+    } else if (idxToDelete < activeSlideIndex) {
+      nextActiveIndex = activeSlideIndex - 1;
+    }
+    nextActiveIndex = Math.max(0, Math.min(nextActiveIndex, Math.max(0, nextSlides.length - 1)));
+
+    setSlides(nextSlides);
+    pushHistory(nextSlides);
+    setActiveSlideIndex(nextActiveIndex);
+
+    if (nextSlides.length > 0) {
+      setSelectedLayer({ type: "slot", id: 0 });
+    } else {
+      setSelectedLayer(null);
+    }
+
+    showToast(`Deleted Slide #${idxToDelete + 1}`);
+    setDeleteConfirmSlideIndex(null);
+    setIsDeletingSlide(false);
+  };
+
+  const handleDeleteSlide = (idx: number) => {
+    promptDeleteSlide(idx);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && deleteConfirmSlideIndex !== null && !isDeletingSlide) {
+        setDeleteConfirmSlideIndex(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [deleteConfirmSlideIndex, isDeletingSlide]);
 
   // Text element actions
   const handleAddTextElement = (preset?: Partial<TextElement>) => {
@@ -1469,257 +1529,310 @@ export default function Home() {
                         }
                       }}
                     >
-                      <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
-                        {/* Photo Slots */}
-                        {activePreset.slots.map((slot) => {
-                          const photo = photos[slot.slot_index] || {
-                            id: `fallback-${slot.slot_index}`,
-                            url: getPresetSlotImageUrl(activePreset, slot.slot_index),
-                            file: null,
-                            name: `${activePreset.name} - Slot #${slot.slot_index + 1}`,
-                          };
-                          const isSelected = selectedSlotIndex === slot.slot_index;
-                          const transform = transforms[slot.slot_index] || { ...DEFAULT_TRANSFORM };
-                          if (transform.hidden) return null;
-
-                          const leftPct = (slot.x / 1080) * 100;
-                          const topPct = (slot.y / 1350) * 100;
-                          const widthPct = (slot.width / 1080) * 100;
-                          const heightPct = (slot.height / 1350) * 100;
-                          const radiusPx = (slot.border_radius / 1080) * 350;
-
-                          // Build image filter string
-                          const filterList: string[] = [];
-                          if (isAutoEnhanceEnabled) filterList.push("saturate(1.15) contrast(1.10)");
-                          if (transform.brightness) filterList.push(`brightness(${1 + transform.brightness / 100})`);
-                          if (transform.contrast) filterList.push(`contrast(${1 + transform.contrast / 100})`);
-                          if (transform.saturation) filterList.push(`saturate(${1 + transform.saturation / 100})`);
-                          if (transform.warmth) filterList.push(`sepia(${Math.max(0, transform.warmth / 100)})`);
-                          if (transform.filter === "natural") filterList.push("contrast(1.05) saturate(1.08)");
-                          else if (transform.filter === "vivid") filterList.push("contrast(1.15) saturate(1.25)");
-                          else if (transform.filter === "film") filterList.push("sepia(0.2) contrast(1.1) brightness(0.95)");
-                          else if (transform.filter === "bw") filterList.push("grayscale(1) contrast(1.15)");
-                          else if (transform.filter === "warm") filterList.push("sepia(0.3) saturate(1.15)");
-                          const filterStyle = filterList.join(" ") || "none";
-
-                          return (
-                            <div
-                              key={`slot-${slot.slot_index}-${photo.id}`}
-                              id={`slot-${slot.slot_index}`}
-                              className={`canvas-slot-interactive${isSelected ? " slot-selected" : ""}`}
-                              style={{
-                                position: "absolute",
-                                left: `${leftPct}%`,
-                                top: `${topPct}%`,
-                                width: `${widthPct}%`,
-                                height: `${heightPct}%`,
-                                borderRadius: `${radiusPx}px`,
-                                backgroundColor: "#0d1017",
-                                border: transform.border_style && transform.border_style !== "none"
-                                  ? `${transform.border_width || 2}px ${transform.border_style} ${transform.border_color || "#fff"}`
-                                  : undefined,
-                                boxShadow: transform.shadow ? "0 14px 36px rgba(0,0,0,0.6)" : undefined,
-                                overflow: "hidden",
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedLayer({ type: "slot", id: slot.slot_index });
-                                setRightInspectorTab("edit");
-                              }}
-                              onMouseDown={(e) => {
-                                if (transform.locked) return;
-                                setSelectedLayer({ type: "slot", id: slot.slot_index });
-                                setDraggingSlot({
-                                  slotIndex: slot.slot_index,
-                                  startX: e.clientX,
-                                  startY: e.clientY,
-                                  initialOffsetX: transform.offset_x || 0,
-                                  initialOffsetY: transform.offset_y || 0,
-                                });
-                              }}
-                              onWheel={(e) => handleSlotWheel(slot.slot_index, e)}
+                      {slides.length === 0 ? (
+                        <div style={{
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: 32,
+                          textAlign: "center",
+                          background: "radial-gradient(circle at center, rgba(139,92,246,0.08) 0%, rgba(8,10,15,0.98) 75%)",
+                        }}>
+                          <div style={{
+                            width: 52,
+                            height: 52,
+                            borderRadius: "50%",
+                            background: "rgba(139,92,246,0.12)",
+                            border: "1px solid rgba(139,92,246,0.3)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginBottom: 14,
+                            color: "var(--accent-violet-mid)",
+                          }}>
+                            <Layout size={24} />
+                          </div>
+                          <h3 style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Carousel is Empty</h3>
+                          <p style={{ fontSize: 11.5, color: "var(--text-muted)", marginBottom: 18, maxWidth: 220, lineHeight: 1.5 }}>
+                            All slides have been deleted. Add a slide or select a template to continue.
+                          </p>
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <button
+                              type="button"
+                              className="btn-primary"
+                              onClick={handleAddNewSlide}
+                              style={{ padding: "7px 14px", fontSize: 11.5 }}
                             >
-                              <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
-                                <img
-                                  src={photo.url}
-                                  alt={photo.name}
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: (slot.fit_mode as any) || "cover",
-                                    display: "block",
-                                    pointerEvents: "none",
-                                    transform: `translate(${transform.offset_x || 0}px, ${transform.offset_y || 0}px) scale(${(transform.flip_h ? -1 : 1) * (transform.scale || 1.0)}, ${(transform.flip_v ? -1 : 1) * (transform.scale || 1.0)}) rotate(${transform.rotation || 0}deg)`,
-                                    transformOrigin: "center center",
-                                    filter: filterStyle,
-                                  }}
-                                  draggable={false}
-                                />
-                              </div>
-
-                              {/* Corner Slot Badge */}
-                              <div className="slot-corner-badge">
-                                <span>{String(slot.slot_index + 1).padStart(2, "0")}</span>
-                                {transform.scale !== 1.0 && <span>{Math.round((transform.scale || 1) * 100)}%</span>}
-                              </div>
-
-                              {/* Selection Bounding Handles */}
-                              {isSelected && (
-                                <>
-                                  <div className="selection-bounding-box" />
-                                  <div className="selection-handle tl" />
-                                  <div className="selection-handle tm" />
-                                  <div className="selection-handle tr" />
-                                  <div className="selection-handle ml" />
-                                  <div className="selection-handle mr" />
-                                  <div className="selection-handle bl" />
-                                  <div className="selection-handle bm" />
-                                  <div className="selection-handle br" />
-
-                                  {/* Floating Mini Toolbar */}
-                                  <div className="slot-mini-toolbar" onClick={(e) => e.stopPropagation()}>
-                                    <button className="mini-btn" onClick={() => setRightInspectorTab("edit")} title="Crop/Transform">
-                                      <Crop size={11} />
-                                    </button>
-                                    <button className="mini-btn" onClick={() => updateSlotTransform(slot.slot_index, { scale: 1.0 })} title="Fit">
-                                      <Minimize2 size={11} />
-                                    </button>
-                                    <button className="mini-btn" onClick={() => updateSlotTransform(slot.slot_index, { scale: 1.35 })} title="Fill">
-                                      <Maximize2 size={11} />
-                                    </button>
-                                    <button
-                                      className="mini-btn"
-                                      onClick={() => updateSlotTransform(slot.slot_index, { flip_h: !transform.flip_h })}
-                                      title="Flip Horizontally"
-                                    >
-                                      <FlipHorizontal size={11} />
-                                    </button>
-                                    <button className="mini-btn" onClick={() => handleResetSlotTransform(slot.slot_index)} title="Reset">
-                                      <RefreshCw size={11} />
-                                    </button>
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          );
-                        })}
-
-                        {/* Interactive Text Layers (User added) */}
-                        {textElements.map((te) => {
-                          if (te.hidden) return null;
-                          const isSelected = selectedTextId === te.id;
-                          return (
-                            <div
-                              key={te.id}
-                              id={te.id}
-                              className={`canvas-text-interactive${isSelected ? " text-selected" : ""}`}
-                              style={{
-                                position: "absolute",
-                                left: `${(te.x / 1080) * 100}%`,
-                                top: `${(te.y / 1350) * 100}%`,
-                                transform: `translate(-50%, -50%) rotate(${te.rotation || 0}deg)`,
-                                color: te.color,
-                                fontFamily: `"${te.font}", sans-serif`,
-                                fontSize: `${(te.size / 1080) * 360}px`,
-                                fontWeight: te.weight,
-                                textAlign: te.align as any,
-                                letterSpacing: `${te.letterSpacing}px`,
-                                lineHeight: te.lineHeight,
-                                opacity: (te.opacity ?? 100) / 100,
-                                textShadow: te.shadow ? "0 4px 16px rgba(0,0,0,0.8)" : "none",
-                                zIndex: isSelected ? 25 : 20,
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedLayer({ type: "text", id: te.id });
-                                setCanvasTool("text");
-                                setIsTextPanelOpen(true);
-                                setRightInspectorTab("edit");
-                              }}
-                              onMouseDown={(e) => {
-                                if (te.locked) return;
-                                e.stopPropagation();
-                                setSelectedLayer({ type: "text", id: te.id });
-                                setCanvasTool("text");
-                                setIsTextPanelOpen(true);
-                                setDraggingText({ textId: te.id, startX: e.clientX, startY: e.clientY, initialX: te.x, initialY: te.y });
-                              }}
+                              <Plus size={13} />
+                              <span>Add Slide</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-ghost"
+                              onClick={() => setAppView("templates")}
+                              style={{ padding: "7px 12px", fontSize: 11.5 }}
                             >
-                              <span>{te.text}</span>
-                              {isSelected && (
-                                <div className="text-select-border">
-                                  <div className="selection-handle tl" />
-                                  <div className="selection-handle tr" />
-                                  <div className="selection-handle bl" />
-                                  <div className="selection-handle br" />
+                              <Compass size={13} />
+                              <span>Templates</span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
+                          {/* Photo Slots */}
+                          {activePreset.slots.map((slot) => {
+                            const photo = photos[slot.slot_index] || {
+                              id: `fallback-${slot.slot_index}`,
+                              url: getPresetSlotImageUrl(activePreset, slot.slot_index),
+                              file: null,
+                              name: `${activePreset.name} - Slot #${slot.slot_index + 1}`,
+                            };
+                            const isSelected = selectedSlotIndex === slot.slot_index;
+                            const transform = transforms[slot.slot_index] || { ...DEFAULT_TRANSFORM };
+                            if (transform.hidden) return null;
+
+                            const leftPct = (slot.x / 1080) * 100;
+                            const topPct = (slot.y / 1350) * 100;
+                            const widthPct = (slot.width / 1080) * 100;
+                            const heightPct = (slot.height / 1350) * 100;
+                            const radiusPx = (slot.border_radius / 1080) * 350;
+
+                            // Build image filter string
+                            const filterList: string[] = [];
+                            if (isAutoEnhanceEnabled) filterList.push("saturate(1.15) contrast(1.10)");
+                            if (transform.brightness) filterList.push(`brightness(${1 + transform.brightness / 100})`);
+                            if (transform.contrast) filterList.push(`contrast(${1 + transform.contrast / 100})`);
+                            if (transform.saturation) filterList.push(`saturate(${1 + transform.saturation / 100})`);
+                            if (transform.warmth) filterList.push(`sepia(${Math.max(0, transform.warmth / 100)})`);
+                            if (transform.filter === "natural") filterList.push("contrast(1.05) saturate(1.08)");
+                            else if (transform.filter === "vivid") filterList.push("contrast(1.15) saturate(1.25)");
+                            else if (transform.filter === "film") filterList.push("sepia(0.2) contrast(1.1) brightness(0.95)");
+                            else if (transform.filter === "bw") filterList.push("grayscale(1) contrast(1.15)");
+                            else if (transform.filter === "warm") filterList.push("sepia(0.3) saturate(1.15)");
+                            const filterStyle = filterList.join(" ") || "none";
+
+                            return (
+                              <div
+                                key={`slot-${slot.slot_index}-${photo.id}`}
+                                id={`slot-${slot.slot_index}`}
+                                className={`canvas-slot-interactive${isSelected ? " slot-selected" : ""}`}
+                                style={{
+                                  position: "absolute",
+                                  left: `${leftPct}%`,
+                                  top: `${topPct}%`,
+                                  width: `${widthPct}%`,
+                                  height: `${heightPct}%`,
+                                  borderRadius: `${radiusPx}px`,
+                                  backgroundColor: "#0d1017",
+                                  border: transform.border_style && transform.border_style !== "none"
+                                    ? `${transform.border_width || 2}px ${transform.border_style} ${transform.border_color || "#fff"}`
+                                    : undefined,
+                                  boxShadow: transform.shadow ? "0 14px 36px rgba(0,0,0,0.6)" : undefined,
+                                  overflow: "hidden",
+                                }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedLayer({ type: "slot", id: slot.slot_index });
+                                  setRightInspectorTab("edit");
+                                }}
+                                onMouseDown={(e) => {
+                                  if (transform.locked) return;
+                                  setSelectedLayer({ type: "slot", id: slot.slot_index });
+                                  setDraggingSlot({
+                                    slotIndex: slot.slot_index,
+                                    startX: e.clientX,
+                                    startY: e.clientY,
+                                    initialOffsetX: transform.offset_x || 0,
+                                    initialOffsetY: transform.offset_y || 0,
+                                  });
+                                }}
+                                onWheel={(e) => handleSlotWheel(slot.slot_index, e)}
+                              >
+                                <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
+                                  <img
+                                    src={photo.url}
+                                    alt={photo.name}
+                                    style={{
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: (slot.fit_mode as any) || "cover",
+                                      display: "block",
+                                      pointerEvents: "none",
+                                      transform: `translate(${transform.offset_x || 0}px, ${transform.offset_y || 0}px) scale(${(transform.flip_h ? -1 : 1) * (transform.scale || 1.0)}, ${(transform.flip_v ? -1 : 1) * (transform.scale || 1.0)}) rotate(${transform.rotation || 0}deg)`,
+                                      transformOrigin: "center center",
+                                      filter: filterStyle,
+                                    }}
+                                    draggable={false}
+                                  />
                                 </div>
-                              )}
-                            </div>
-                          );
-                        })}
 
-                        {/* Stickers (User added) */}
-                        {stickers.map((stk) => {
-                          if (stk.hidden) return null;
-                          const isSelected = selectedStickerId === stk.id;
-                          if (stk.type === "note") {
+                                {/* Corner Slot Badge */}
+                                <div className="slot-corner-badge">
+                                  <span>{String(slot.slot_index + 1).padStart(2, "0")}</span>
+                                  {transform.scale !== 1.0 && <span>{Math.round((transform.scale || 1) * 100)}%</span>}
+                                </div>
+
+                                {/* Selection Bounding Handles */}
+                                {isSelected && (
+                                  <>
+                                    <div className="selection-bounding-box" />
+                                    <div className="selection-handle tl" />
+                                    <div className="selection-handle tm" />
+                                    <div className="selection-handle tr" />
+                                    <div className="selection-handle ml" />
+                                    <div className="selection-handle mr" />
+                                    <div className="selection-handle bl" />
+                                    <div className="selection-handle bm" />
+                                    <div className="selection-handle br" />
+
+                                    {/* Floating Mini Toolbar */}
+                                    <div className="slot-mini-toolbar" onClick={(e) => e.stopPropagation()}>
+                                      <button className="mini-btn" onClick={() => setRightInspectorTab("edit")} title="Crop/Transform">
+                                        <Crop size={11} />
+                                      </button>
+                                      <button className="mini-btn" onClick={() => updateSlotTransform(slot.slot_index, { scale: 1.0 })} title="Fit">
+                                        <Minimize2 size={11} />
+                                      </button>
+                                      <button className="mini-btn" onClick={() => updateSlotTransform(slot.slot_index, { scale: 1.35 })} title="Fill">
+                                        <Maximize2 size={11} />
+                                      </button>
+                                      <button
+                                        className="mini-btn"
+                                        onClick={() => updateSlotTransform(slot.slot_index, { flip_h: !transform.flip_h })}
+                                        title="Flip Horizontally"
+                                      >
+                                        <FlipHorizontal size={11} />
+                                      </button>
+                                      <button className="mini-btn" onClick={() => handleResetSlotTransform(slot.slot_index)} title="Reset">
+                                        <RefreshCw size={11} />
+                                      </button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            );
+                          })}
+
+                          {/* Interactive Text Layers (User added) */}
+                          {textElements.map((te) => {
+                            if (te.hidden) return null;
+                            const isSelected = selectedTextId === te.id;
                             return (
                               <div
-                                key={stk.id}
-                                className={`canvas-sticker-interactive note-sticker${isSelected ? " sticker-selected" : ""}`}
+                                key={te.id}
+                                id={te.id}
+                                className={`canvas-text-interactive${isSelected ? " text-selected" : ""}`}
                                 style={{
                                   position: "absolute",
-                                  left: `${(stk.x / 1080) * 100}%`,
-                                  top: `${(stk.y / 1350) * 100}%`,
-                                  transform: `rotate(${stk.rotation || 0}deg) scale(${stk.scale || 1.0})`,
-                                  zIndex: isSelected ? 30 : 22,
+                                  left: `${(te.x / 1080) * 100}%`,
+                                  top: `${(te.y / 1350) * 100}%`,
+                                  transform: `translate(-50%, -50%) rotate(${te.rotation || 0}deg)`,
+                                  color: te.color,
+                                  fontFamily: `"${te.font}", sans-serif`,
+                                  fontSize: `${(te.size / 1080) * 360}px`,
+                                  fontWeight: te.weight,
+                                  textAlign: te.align as any,
+                                  letterSpacing: `${te.letterSpacing}px`,
+                                  lineHeight: te.lineHeight,
+                                  opacity: (te.opacity ?? 100) / 100,
+                                  textShadow: te.shadow ? "0 4px 16px rgba(0,0,0,0.8)" : "none",
+                                  zIndex: isSelected ? 25 : 20,
                                 }}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setSelectedLayer({ type: "sticker", id: stk.id });
+                                  setSelectedLayer({ type: "text", id: te.id });
+                                  setCanvasTool("text");
+                                  setIsTextPanelOpen(true);
                                   setRightInspectorTab("edit");
                                 }}
                                 onMouseDown={(e) => {
-                                  if (stk.locked) return;
+                                  if (te.locked) return;
                                   e.stopPropagation();
-                                  setSelectedLayer({ type: "sticker", id: stk.id });
-                                  setDraggingSticker({ stickerId: stk.id, startX: e.clientX, startY: e.clientY, initialX: stk.x, initialY: stk.y });
+                                  setSelectedLayer({ type: "text", id: te.id });
+                                  setCanvasTool("text");
+                                  setIsTextPanelOpen(true);
+                                  setDraggingText({ textId: te.id, startX: e.clientX, startY: e.clientY, initialX: te.x, initialY: te.y });
                                 }}
                               >
-                                <span>{stk.content}</span>
+                                <span>{te.text}</span>
+                                {isSelected && (
+                                  <div className="text-select-border">
+                                    <div className="selection-handle tl" />
+                                    <div className="selection-handle tr" />
+                                    <div className="selection-handle bl" />
+                                    <div className="selection-handle br" />
+                                  </div>
+                                )}
                               </div>
                             );
-                          } else if (stk.type === "heart") {
-                            return (
-                              <div
-                                key={stk.id}
-                                className={`canvas-sticker-interactive doodle-heart${isSelected ? " sticker-selected" : ""}`}
-                                style={{
-                                  position: "absolute",
-                                  left: `${(stk.x / 1080) * 100}%`,
-                                  top: `${(stk.y / 1350) * 100}%`,
-                                  transform: `rotate(${stk.rotation || 0}deg) scale(${stk.scale || 1.0})`,
-                                  zIndex: isSelected ? 30 : 22,
-                                }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedLayer({ type: "sticker", id: stk.id });
-                                  setRightInspectorTab("edit");
-                                }}
-                                onMouseDown={(e) => {
-                                  if (stk.locked) return;
-                                  e.stopPropagation();
-                                  setSelectedLayer({ type: "sticker", id: stk.id });
-                                  setDraggingSticker({ stickerId: stk.id, startX: e.clientX, startY: e.clientY, initialX: stk.x, initialY: stk.y });
-                                }}
-                              >
-                                <span style={{ color: "#fff" }}>♡</span>
-                              </div>
-                            );
-                          }
-                          return null;
-                        })}
-                      </div>
+                          })}
+
+                          {/* Stickers (User added) */}
+                          {stickers.map((stk) => {
+                            if (stk.hidden) return null;
+                            const isSelected = selectedStickerId === stk.id;
+                            if (stk.type === "note") {
+                              return (
+                                <div
+                                  key={stk.id}
+                                  className={`canvas-sticker-interactive note-sticker${isSelected ? " sticker-selected" : ""}`}
+                                  style={{
+                                    position: "absolute",
+                                    left: `${(stk.x / 1080) * 100}%`,
+                                    top: `${(stk.y / 1350) * 100}%`,
+                                    transform: `rotate(${stk.rotation || 0}deg) scale(${stk.scale || 1.0})`,
+                                    zIndex: isSelected ? 30 : 22,
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedLayer({ type: "sticker", id: stk.id });
+                                    setRightInspectorTab("edit");
+                                  }}
+                                  onMouseDown={(e) => {
+                                    if (stk.locked) return;
+                                    e.stopPropagation();
+                                    setSelectedLayer({ type: "sticker", id: stk.id });
+                                    setDraggingSticker({ stickerId: stk.id, startX: e.clientX, startY: e.clientY, initialX: stk.x, initialY: stk.y });
+                                  }}
+                                >
+                                  <span>{stk.content}</span>
+                                </div>
+                              );
+                            } else if (stk.type === "heart") {
+                              return (
+                                <div
+                                  key={stk.id}
+                                  className={`canvas-sticker-interactive doodle-heart${isSelected ? " sticker-selected" : ""}`}
+                                  style={{
+                                    position: "absolute",
+                                    left: `${(stk.x / 1080) * 100}%`,
+                                    top: `${(stk.y / 1350) * 100}%`,
+                                    transform: `rotate(${stk.rotation || 0}deg) scale(${stk.scale || 1.0})`,
+                                    zIndex: isSelected ? 30 : 22,
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedLayer({ type: "sticker", id: stk.id });
+                                    setRightInspectorTab("edit");
+                                  }}
+                                  onMouseDown={(e) => {
+                                    if (stk.locked) return;
+                                    e.stopPropagation();
+                                    setSelectedLayer({ type: "sticker", id: stk.id });
+                                    setDraggingSticker({ stickerId: stk.id, startX: e.clientX, startY: e.clientY, initialX: stk.x, initialY: stk.y });
+                                  }}
+                                >
+                                  <span style={{ color: "#fff" }}>♡</span>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                      )}
 
                       {/* Hint badge */}
                       <div className="canvas-hint-badge">
@@ -1741,10 +1854,37 @@ export default function Home() {
                         <Plus size={13} />
                         <span>Add Slide</span>
                       </button>
+
+                      {slides.length > 0 && (
+                        <button
+                          type="button"
+                          className="btn-ghost"
+                          onClick={() => promptDeleteSlide(activeSlideIndex)}
+                          style={{
+                            border: "1px solid rgba(244,63,94,0.25)",
+                            color: "var(--accent-rose)",
+                            background: "rgba(244,63,94,0.06)",
+                            fontSize: 11,
+                            padding: "6px 10px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 5,
+                          }}
+                          title={`Delete currently selected slide #${activeSlideIndex + 1}`}
+                        >
+                          <Trash2 size={12} />
+                          <span>Delete Slide</span>
+                        </button>
+                      )}
                     </div>
 
                     {/* Slides Thumbnails Container */}
                     <div className="timeline-slides-container">
+                      {slides.length === 0 && (
+                        <span style={{ fontSize: 11, color: "var(--text-faint)", fontStyle: "italic", padding: "0 8px" }}>
+                          No slides in project
+                        </span>
+                      )}
                       {slides.map((s, idx) => {
                         const isActive = activeSlideIndex === idx;
                         const slidePreset = PRESET_LAYOUTS.find((p) => p.layout_id === s.presetId) || PRESET_LAYOUTS[0];
@@ -1763,11 +1903,23 @@ export default function Home() {
                             <img src={previewThumb} alt="" onError={(e) => { e.currentTarget.src = "/demo/demo1.jpg"; }} />
                             <div className="slide-box-badge">{idx + 1}</div>
 
-                            <div className="slide-box-options" onClick={(e) => {
-                              e.stopPropagation();
-                              handleDuplicateSlide(idx);
-                            }} title="Duplicate slide">
-                              <Copy size={9} />
+                            <div className="slide-box-options" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                type="button"
+                                className="slide-opt-btn"
+                                onClick={() => handleDuplicateSlide(idx)}
+                                title="Duplicate slide"
+                              >
+                                <Copy size={9} />
+                              </button>
+                              <button
+                                type="button"
+                                className="slide-opt-btn danger"
+                                onClick={() => promptDeleteSlide(idx)}
+                                title="Delete slide"
+                              >
+                                <Trash2 size={9} />
+                              </button>
                             </div>
                           </div>
                         );
@@ -1828,8 +1980,27 @@ export default function Home() {
                   </div>
 
                   <div className="inspector-body">
-                    {/* ── TAB 1: EDIT (CONTEXTUAL) ────────────────────────── */}
-                    {rightInspectorTab === "edit" && (
+                    {slides.length === 0 ? (
+                      <div style={{ padding: "48px 16px", textAlign: "center", color: "var(--text-muted)" }}>
+                        <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: "var(--text-faint)" }}>
+                          <Layout size={20} />
+                        </div>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>No Active Slide</p>
+                        <p style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.4 }}>Add a slide to edit images, transforms, and layers.</p>
+                        <button
+                          type="button"
+                          className="btn-ghost"
+                          onClick={handleAddNewSlide}
+                          style={{ fontSize: 11, margin: "0 auto", gap: 6, padding: "6px 12px" }}
+                        >
+                          <Plus size={12} />
+                          <span>Add Slide</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {/* ── TAB 1: EDIT (CONTEXTUAL) ────────────────────────── */}
+                        {rightInspectorTab === "edit" && (
                       <>
                         {/* When Text is selected, show dedicated text formatting controls */}
                         {selectedTextId && activeSelectedText ? (
@@ -2533,8 +2704,10 @@ export default function Home() {
                         )}
                       </div>
                     )}
-                  </div>
-                </aside>
+                  </>
+                )}
+              </div>
+            </aside>
               </div>
             </>
           )
@@ -2597,6 +2770,95 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* ── Slide Deletion Confirmation Modal ──────────────────────────── */}
+      {deleteConfirmSlideIndex !== null && slides[deleteConfirmSlideIndex] && (
+        <div
+          className="modal-overlay"
+          onClick={() => !isDeletingSlide && setDeleteConfirmSlideIndex(null)}
+          style={{ zIndex: 130 }}
+        >
+          <div
+            className="modal-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: 420,
+              padding: 24,
+              background: "rgba(13, 16, 26, 0.98)",
+              border: "1px solid rgba(244, 63, 94, 0.3)",
+              boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(244, 63, 94, 0.15)",
+              borderRadius: 16,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 10,
+                  background: "rgba(244, 63, 94, 0.12)",
+                  border: "1px solid rgba(244, 63, 94, 0.3)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--accent-rose)",
+                  flexShrink: 0,
+                }}
+              >
+                <Trash2 size={20} />
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
+                  Delete Slide #{deleteConfirmSlideIndex + 1}?
+                </h3>
+                <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.55, marginBottom: 16 }}>
+                  {slides.length <= 1
+                    ? "This is the last remaining slide in your carousel. Deleting it will clear the canvas and reset the carousel."
+                    : isSlideEdited(slides[deleteConfirmSlideIndex])
+                    ? "This slide contains customized photos, text layers, or visual styling. Deleting it cannot be undone."
+                    : "Are you sure you want to permanently remove this slide from your carousel project?"}
+                </p>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                  <button
+                    type="button"
+                    className="btn-ghost"
+                    onClick={() => setDeleteConfirmSlideIndex(null)}
+                    disabled={isDeletingSlide}
+                    style={{ padding: "7px 14px", fontSize: 12 }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmDeleteSlide}
+                    disabled={isDeletingSlide}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "7px 15px",
+                      borderRadius: 8,
+                      background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                      border: "none",
+                      color: "#fff",
+                      fontWeight: 600,
+                      fontSize: 12,
+                      cursor: isDeletingSlide ? "not-allowed" : "pointer",
+                      boxShadow: "0 4px 14px rgba(239, 68, 68, 0.4)",
+                      opacity: isDeletingSlide ? 0.7 : 1,
+                    }}
+                  >
+                    <Trash2 size={13} />
+                    <span>{isDeletingSlide ? "Deleting..." : "Delete Slide"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Comprehensive Export Workflow Modal ─────────────────────────── */}
       {isExportModalOpen && (
