@@ -40,6 +40,14 @@ interface TemplateRecommendation {
   preset: LayoutPreset;
 }
 
+interface HashtagSet {
+  id: string;
+  category: string;
+  label: string;
+  tags: string[];
+  explanation: string;
+}
+
 interface CaptionPayload {
   summary?: string;
   aesthetic: string;
@@ -344,6 +352,15 @@ export default function Home() {
   const [selectedPreviewPhotoIdx, setSelectedPreviewPhotoIdx] = useState<number>(0);
   const [enhancedBatchCount, setEnhancedBatchCount] = useState<number | null>(null);
   const [isHoldingCompare, setIsHoldingCompare] = useState<boolean>(false);
+
+  // Dedicated Generate Hashtags state (Phase 4)
+  const [generatedHashtagSets, setGeneratedHashtagSets] = useState<HashtagSet[]>([]);
+  const [recentHashtagTags, setRecentHashtagTags] = useState<string[]>([]);
+  const [isGeneratingHashtags, setIsGeneratingHashtags] = useState<boolean>(false);
+  const [hashtagLoadingStep, setHashtagLoadingStep] = useState<string>("Analyzing image context & mood…");
+  const [hashtagError, setHashtagError] = useState<string | null>(null);
+  const [copiedSetIdx, setCopiedSetIdx] = useState<number | null>(null);
+  const [isAllCopied, setIsAllCopied] = useState<boolean>(false);
 
   const [mediaLibraryPool, setMediaLibraryPool] = useState<PhotoItem[]>([
     ...DEFAULT_DEMO_PHOTOS,
@@ -1537,6 +1554,102 @@ export default function Home() {
     handleRedo();
   };
 
+  // Dedicated Generate Hashtags Handlers (Phase 4)
+  const handleGenerateHashtags = async (isRefresh: boolean = false) => {
+    if (isGeneratingHashtags) return;
+
+    setIsGeneratingHashtags(true);
+    setHashtagError(null);
+    setHashtagLoadingStep("Analyzing combined scene & visual tone…");
+
+    const imageUrls = (activeSlide?.photos || [])
+      .map((p) => p.url)
+      .filter((u): u is string => typeof u === "string" && u.trim().length > 0);
+
+    const timer1 = setTimeout(() => {
+      setHashtagLoadingStep("Formulating 5 distinct strategies (Mood, Subject, Community, Niche, Reach)…");
+    }, 900);
+
+    const timer2 = setTimeout(() => {
+      setHashtagLoadingStep("Deduplicating against recent sets & normalizing tags…");
+    }, 2200);
+
+    try {
+      const res = await fetch("/api/ai/hashtags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          images: imageUrls,
+          recent_hashtags: isRefresh ? recentHashtagTags : [],
+          scene_summary: sceneSummary || null,
+          title: projectTitle || "LazyLens Post",
+          template_name: activePreset?.name || "Editorial Grid",
+        }),
+      });
+
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `Hashtag generation failed (${res.status})`);
+      }
+
+      if (data.hashtag_sets && Array.isArray(data.hashtag_sets) && data.hashtag_sets.length === 5) {
+        setGeneratedHashtagSets(data.hashtag_sets);
+        if (data.scene_summary && !sceneSummary) {
+          setSceneSummary(data.scene_summary);
+        }
+
+        // Track new tags to avoid duplicates on refresh
+        const newTags = data.hashtag_sets.flatMap((s: HashtagSet) => s.tags);
+        setRecentHashtagTags((prev) => {
+          const combined = [...prev, ...newTags];
+          return combined.slice(-60);
+        });
+
+        showToast(isRefresh ? "Refreshed 5 new hashtag sets" : "Generated 5 curated hashtag sets");
+      } else {
+        throw new Error("Received incomplete hashtag sets from generation service.");
+      }
+    } catch (err: any) {
+      console.error("Hashtag generation error:", err);
+      setHashtagError(err?.message || "Failed to generate hashtags. Please verify service availability.");
+      showToast("AI Service Error: Failed to generate hashtags");
+    } finally {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      setIsGeneratingHashtags(false);
+    }
+  };
+
+  const handleCopyHashtagSet = (tags: string[], index: number) => {
+    const text = tags.join(" ");
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text);
+    }
+    setCopiedSetIdx(index);
+    showToast(`Copied Set #${index + 1} (${tags.length} tags) to clipboard`);
+    setTimeout(() => {
+      setCopiedSetIdx(null);
+    }, 2000);
+  };
+
+  const handleCopyAllHashtags = () => {
+    if (generatedHashtagSets.length === 0) return;
+    const allFormatted = generatedHashtagSets
+      .map((s, i) => `// Set ${i + 1}: ${s.category} (${s.label})\n${s.tags.join(" ")}`)
+      .join("\n\n");
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(allFormatted);
+    }
+    setIsAllCopied(true);
+    showToast("Copied all 5 hashtag sets to clipboard");
+    setTimeout(() => {
+      setIsAllCopied(false);
+    }, 2000);
+  };
+
   // AI Actions Trigger
   const handleTriggerAiAction = async (action: "captions" | "layouts" | "enhance" | "bg" | "hashtags") => {
     setActiveAiModal(action);
@@ -1561,6 +1674,13 @@ export default function Home() {
       return;
     }
 
+    if (action === "hashtags") {
+      if (generatedHashtagSets.length === 0 && !isGeneratingHashtags) {
+        handleGenerateHashtags(false);
+      }
+      return;
+    }
+
     setAiSuggestions(null);
     showToast(`AI Studio: Analyzing ${action}…`);
 
@@ -1578,19 +1698,9 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         setAiSuggestions(data.result);
-      } else {
-        if (action === "hashtags") {
-          setAiSuggestions({
-            tags: ["#photogram", "#creativeflow", "#visualstory", "#lazylens", "#contentcreator", "#aestheticpost"],
-          });
-        }
       }
     } catch {
-      if (action === "hashtags") {
-        setAiSuggestions({
-          tags: ["#lazylens", "#visualstory", "#aesthetic"],
-        });
-      }
+      // Background removal or general mock action
     }
   };
 
@@ -3676,6 +3786,187 @@ export default function Home() {
                               </button>
                             )}
                           </div>
+                        ) : activeAiModal === "hashtags" ? (
+                          <div className="ai-hashtags-view">
+                            {/* Top Back Navigation */}
+                            <div className="ai-captions-nav">
+                              <button className="ai-back-btn" onClick={() => setActiveAiModal(null)}>
+                                <ChevronLeft size={14} /> Back to AI Tools
+                              </button>
+                              <span className="ai-badge-model" style={{ color: "#ec4899", borderColor: "rgba(236, 72, 153, 0.3)" }}>
+                                Context & Discovery AI
+                              </span>
+                            </div>
+
+                            {/* Section Header */}
+                            <div className="ai-captions-header">
+                              <div className="ai-captions-title-row">
+                                <div className="ai-captions-title">Generate Hashtags</div>
+                              </div>
+                              <div className="ai-captions-subtitle">
+                                5 distinct hashtag strategies based on image context, lighting, mood & aesthetics
+                              </div>
+
+                              {/* Mini Photos Preview Strip */}
+                              <div className="ai-photos-preview-strip">
+                                {activeSlide.photos.map((p, idx) => (
+                                  <div key={`hashtag-strip-${p.id || idx}`} className="ai-strip-thumb" title={p.name || `Photo #${idx + 1}`}>
+                                    <img
+                                      src={p.url}
+                                      alt=""
+                                      onError={(e) => {
+                                        (e.currentTarget as HTMLImageElement).src = "/demo/demo1.jpg";
+                                      }}
+                                    />
+                                    <span className="ai-strip-badge">{idx + 1}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Loading State */}
+                            {isGeneratingHashtags && (
+                              <div className="ai-captions-loading">
+                                <div className="ai-loading-spinner-wrap" style={{ color: "#ec4899" }}>
+                                  <RotateCw size={20} className="ai-spin-icon" />
+                                </div>
+                                <div className="ai-loading-step-text">{hashtagLoadingStep}</div>
+                                <div className="ai-loading-subtext">Formulating 5 distinct sets across aesthetics, subjects, niche & reach</div>
+                                <div className="ai-skeleton-stack">
+                                  {[1, 2, 3, 4, 5].map((n) => (
+                                    <div key={n} className="ai-caption-skeleton" style={{ height: 56 }} />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Error State */}
+                            {!isGeneratingHashtags && hashtagError && (
+                              <div className="ai-caption-error-box">
+                                <div className="ai-error-header">
+                                  <AlertCircle size={16} className="ai-error-icon" />
+                                  <span className="ai-error-title">Hashtag Generation Failed</span>
+                                </div>
+                                <p className="ai-error-desc">{hashtagError}</p>
+                                <button
+                                  className="btn-retry"
+                                  onClick={() => handleGenerateHashtags(false)}
+                                >
+                                  <RotateCw size={13} /> Retry Generation
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Results View */}
+                            {!isGeneratingHashtags && !hashtagError && generatedHashtagSets.length === 5 && (
+                              <div className="ai-hashtags-results">
+                                <div className="ai-results-bar">
+                                  <span className="ai-results-count" style={{ color: "#ec4899" }}>
+                                    5 Distinct Sets Ready
+                                  </span>
+                                  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                                    <button
+                                      className="ai-copy-all-btn"
+                                      onClick={handleCopyAllHashtags}
+                                      title="Copy all 5 sets to clipboard"
+                                    >
+                                      {isAllCopied ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
+                                      <span>{isAllCopied ? "All Copied!" : "Copy All"}</span>
+                                    </button>
+                                    <button
+                                      className="ai-refresh-btn"
+                                      onClick={() => handleGenerateHashtags(true)}
+                                      disabled={isGeneratingHashtags}
+                                      title="Regenerate with new, non-overlapping hashtag combinations"
+                                    >
+                                      <RotateCw size={12} className={isGeneratingHashtags ? "ai-spin-icon" : ""} /> Refresh
+                                    </button>
+                                  </div>
+                                </div>
+
+                                <div className="ai-hashtags-cards-list">
+                                  {generatedHashtagSets.map((set, idx) => {
+                                    const isCopied = copiedSetIdx === idx;
+                                    const categoryMeta: Record<string, { bg: string; color: string; border: string; icon: string }> = {
+                                      "Aesthetic & Mood": { bg: "rgba(139, 92, 246, 0.15)", color: "#c084fc", border: "rgba(139, 92, 246, 0.35)", icon: "✨" },
+                                      "Subject & Activity": { bg: "rgba(59, 130, 246, 0.15)", color: "#60a5fa", border: "rgba(59, 130, 246, 0.35)", icon: "🎯" },
+                                      "Creator Community": { bg: "rgba(16, 185, 129, 0.15)", color: "#34d399", border: "rgba(16, 185, 129, 0.35)", icon: "👥" },
+                                      "Curated Niche": { bg: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", border: "rgba(245, 158, 11, 0.35)", icon: "🏷️" },
+                                      "Broad Discovery": { bg: "rgba(236, 72, 153, 0.15)", color: "#f472b6", border: "rgba(236, 72, 153, 0.35)", icon: "🚀" },
+                                    };
+                                    const meta = categoryMeta[set.category] || categoryMeta["Aesthetic & Mood"];
+
+                                    return (
+                                      <div key={set.id || `set-${idx}`} className="ai-hashtag-card-item">
+                                        <div className="ai-hashtag-card-top">
+                                          <div className="ai-hashtag-cat-info">
+                                            <span
+                                              className="ai-hashtag-cat-pill"
+                                              style={{ background: meta.bg, color: meta.color, borderColor: meta.border }}
+                                            >
+                                              <span style={{ fontSize: 11, marginRight: 4 }}>{meta.icon}</span>
+                                              {set.category}
+                                            </span>
+                                            <span className="ai-hashtag-label">{set.label}</span>
+                                          </div>
+
+                                          <button
+                                            className="caption-action-btn"
+                                            onClick={() => handleCopyHashtagSet(set.tags, idx)}
+                                            title={`Copy Set #${idx + 1}`}
+                                          >
+                                            {isCopied ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
+                                            <span>{isCopied ? "Copied" : "Copy Set"}</span>
+                                          </button>
+                                        </div>
+
+                                        <div className="ai-hashtag-tags-container">
+                                          {set.tags.map((t, tIdx) => (
+                                            <span
+                                              key={`tag-${idx}-${tIdx}`}
+                                              className="ai-hashtag-pill"
+                                              onClick={() => {
+                                                if (navigator?.clipboard?.writeText) {
+                                                  navigator.clipboard.writeText(t);
+                                                  showToast(`Copied ${t}`);
+                                                }
+                                              }}
+                                              title="Click to copy single hashtag"
+                                            >
+                                              {t}
+                                            </span>
+                                          ))}
+                                        </div>
+
+                                        {set.explanation && (
+                                          <div className="ai-hashtag-card-expl">
+                                            {set.explanation}
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Empty State before first generation */}
+                            {!isGeneratingHashtags && !hashtagError && generatedHashtagSets.length === 0 && (
+                              <div className="ai-captions-empty">
+                                <p className="ai-empty-desc">
+                                  Analyze all images in this slide together to generate 5 distinct, high-engagement hashtag sets tailored to your content, aesthetic, community, and niche.
+                                </p>
+                                <button
+                                  className="btn-primary"
+                                  style={{ width: "100%", justifyContent: "center", marginTop: 8, background: "#ec4899", borderColor: "#ec4899" }}
+                                  onClick={() => handleGenerateHashtags(false)}
+                                  disabled={isGeneratingHashtags}
+                                >
+                                  <Terminal size={14} /> Generate 5 Hashtag Sets
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         ) : (
                           <>
                             <div className="inspector-section-header">
@@ -3755,44 +4046,28 @@ export default function Home() {
                                 </div>
                               </div>
 
-                              <div className="ai-tool-card" onClick={() => handleTriggerAiAction("hashtags")}>
+                              <div
+                                className="ai-tool-card"
+                                onClick={() => {
+                                  setActiveAiModal("hashtags");
+                                  if (generatedHashtagSets.length === 0 && !isGeneratingHashtags) {
+                                    handleGenerateHashtags(false);
+                                  }
+                                }}
+                              >
                                 <div className="ai-card-icon-box" style={{ background: "rgba(236,72,153,0.15)", border: "1px solid rgba(236,72,153,0.3)", color: "#ec4899" }}>
                                   <Terminal size={16} />
                                 </div>
                                 <div className="ai-card-info">
                                   <div className="ai-card-title">Generate Hashtags</div>
-                                  <div className="ai-card-desc">Trending relevant tags for high engagement</div>
+                                  <div className="ai-card-desc">
+                                    {generatedHashtagSets.length === 5
+                                      ? "5 hashtag sets ready • Click to view"
+                                      : "Trending relevant tags for high engagement"}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-
-                            {/* Other AI Modals (layouts, hashtags) */}
-                            {activeAiModal && aiSuggestions && (
-                              <div style={{ marginTop: 12, padding: 12, borderRadius: 10, background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.3)" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                                  <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>AI Suggestions</span>
-                                  <button onClick={() => setActiveAiModal(null)} style={{ background: "none", border: "none", color: "var(--text-faint)", cursor: "pointer" }}><X size={12} /></button>
-                                </div>
-
-                                {activeAiModal === "hashtags" && (
-                                  <div>
-                                    <div style={{ fontSize: 11, color: "var(--accent-violet-mid)", lineHeight: 1.6, marginBottom: 8 }}>
-                                      {aiSuggestions.tags?.join(" ")}
-                                    </div>
-                                    <button
-                                      className="copy-btn"
-                                      onClick={() => {
-                                        handleCopy(aiSuggestions.tags?.join(" "), "tags_copy");
-                                        setActiveAiModal(null);
-                                      }}
-                                    >
-                                      Copy Tags
-                                    </button>
-                                  </div>
-                                )}
-
-                              </div>
-                            )}
                           </>
                         )}
                       </div>
