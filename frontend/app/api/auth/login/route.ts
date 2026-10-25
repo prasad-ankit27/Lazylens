@@ -85,6 +85,15 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
+    if (msg.includes("SSL alert number 80") || msg.includes("alert internal error") || msg.includes("tlsv1 alert")) {
+      return NextResponse.json(
+        {
+          error:
+            "MongoDB Atlas blocked the connection: Render's IP is not whitelisted. In MongoDB Atlas, go to Network Access -> Add IP Address -> 'Allow Access From Anywhere' (0.0.0.0/0).",
+        },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { error: err?.message || "An unexpected error occurred during login. Please try again." },
       { status: 500 }
