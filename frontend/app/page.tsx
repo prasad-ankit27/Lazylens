@@ -90,7 +90,7 @@ export function getPresetSlotImageUrl(preset: LayoutPreset, slotIndex: number): 
 export function createSlideFromPreset(slideId: string, presetId: string): CarouselSlide {
   const preset = PRESET_LAYOUTS.find((p) => p.layout_id === presetId) || PRESET_LAYOUTS[0];
   const photos: PhotoItem[] = preset.slots.map((_, sIdx) => ({
-    id: `photo_${preset.layout_id}_${sIdx}`,
+    id: `photo_${preset.layout_id}_${slideId}_${sIdx}`,
     url: getPresetSlotImageUrl(preset, sIdx),
     file: null,
     name: `${preset.name} - Slot #${sIdx + 1}`,
@@ -251,6 +251,12 @@ export default function Home() {
   const [showAllFilters, setShowAllFilters] = useState<boolean>(false);
   const [deleteConfirmSlideIndex, setDeleteConfirmSlideIndex] = useState<number | null>(null);
   const [isDeletingSlide, setIsDeletingSlide] = useState<boolean>(false);
+  const [addSlideModalOpen, setAddSlideModalOpen] = useState<boolean>(false);
+  const [addSlideStep, setAddSlideStep] = useState<"choice" | "templates">("choice");
+  const [selectedTemplateForSlide, setSelectedTemplateForSlide] = useState<LayoutPreset | null>(null);
+  const [templateSearchQuery, setTemplateSearchQuery] = useState<string>("");
+  const [templateCategoryFilter, setTemplateCategoryFilter] = useState<string>("All");
+  const [isAddingSlide, setIsAddingSlide] = useState<boolean>(false);
 
   // Canvas View Controls
   const [zoomLevel, setZoomLevel] = useState<number>(100);
@@ -622,16 +628,51 @@ export default function Home() {
   };
 
   // Slide management
+  const openAddSlideModal = () => {
+    setAddSlideStep("choice");
+    setSelectedTemplateForSlide(activePreset || PRESET_LAYOUTS[0]);
+    setTemplateSearchQuery("");
+    setTemplateCategoryFilter("All");
+    setAddSlideModalOpen(true);
+  };
+
   const handleAddNewSlide = () => {
-    const nextId = `slide_${Date.now()}`;
-    const newSlide = createSlideFromPreset(nextId, activePreset.layout_id);
+    openAddSlideModal();
+  };
+
+  const handleAddBlankSlide = () => {
+    if (isAddingSlide) return;
+    setIsAddingSlide(true);
+    const nextId = `slide_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const presetId = activePreset?.layout_id || PRESET_LAYOUTS[0].layout_id;
+    const newSlide = createSlideFromPreset(nextId, presetId);
     setSlides((prev) => {
       const next = [...prev, newSlide];
       pushHistory(next);
       return next;
     });
     setActiveSlideIndex(slides.length);
-    showToast("Added new slide");
+    setSelectedLayer({ type: "slot", id: 0 });
+    showToast("Added blank slide");
+    setAddSlideModalOpen(false);
+    setIsAddingSlide(false);
+  };
+
+  const confirmAddSlideFromTemplate = () => {
+    if (!selectedTemplateForSlide || isAddingSlide) return;
+    setIsAddingSlide(true);
+    const nextId = `slide_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const newSlide = createSlideFromPreset(nextId, selectedTemplateForSlide.layout_id);
+    setSlides((prev) => {
+      const next = [...prev, newSlide];
+      pushHistory(next);
+      return next;
+    });
+    setActiveSlideIndex(slides.length);
+    setSelectedLayer({ type: "slot", id: 0 });
+    showToast(`Added slide: ${selectedTemplateForSlide.name}`);
+    setAddSlideModalOpen(false);
+    setIsAddingSlide(false);
   };
 
   const handleDuplicateSlide = (idx: number) => {
@@ -718,13 +759,17 @@ export default function Home() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && deleteConfirmSlideIndex !== null && !isDeletingSlide) {
-        setDeleteConfirmSlideIndex(null);
+      if (e.key === "Escape") {
+        if (addSlideModalOpen && !isAddingSlide) {
+          setAddSlideModalOpen(false);
+        } else if (deleteConfirmSlideIndex !== null && !isDeletingSlide) {
+          setDeleteConfirmSlideIndex(null);
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [deleteConfirmSlideIndex, isDeletingSlide]);
+  }, [addSlideModalOpen, isAddingSlide, deleteConfirmSlideIndex, isDeletingSlide]);
 
   // Text element actions
   const handleAddTextElement = (preset?: Partial<TextElement>) => {
@@ -2856,6 +2901,355 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Add Slide Choice / Template Library Modal ──────────────────── */}
+      {addSlideModalOpen && (
+        <div
+          className="modal-overlay"
+          onClick={() => !isAddingSlide && setAddSlideModalOpen(false)}
+          style={{ zIndex: 125 }}
+        >
+          <div
+            className="modal-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: addSlideStep === "choice" ? 480 : 720,
+              width: "100%",
+              maxHeight: "88vh",
+              padding: 24,
+              background: "rgba(12, 14, 24, 0.98)",
+              border: "1px solid rgba(139, 92, 246, 0.28)",
+              boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(139, 92, 246, 0.12)",
+              borderRadius: 16,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {addSlideStep === "choice" ? (
+              /* ── Step 1: Two Clear Choices (Blank vs Template) ── */
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(139, 92, 246, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-violet-mid)" }}>
+                      <Plus size={16} />
+                    </div>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>Add Slide</h3>
+                  </div>
+                  <button
+                    className="modal-close-btn"
+                    onClick={() => setAddSlideModalOpen(false)}
+                    style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 4 }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+                <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 18 }}>
+                  Choose how you'd like to create your next slide in this carousel:
+                </p>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  {/* Choice 1: Blank Slide */}
+                  <div
+                    className="add-slide-choice-card"
+                    onClick={handleAddBlankSlide}
+                    style={{
+                      padding: "22px 16px",
+                      borderRadius: 14,
+                      background: "rgba(255, 255, 255, 0.03)",
+                      border: "1px solid var(--border-subtle)",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      textAlign: "center",
+                      transition: "all 0.18s ease",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 12,
+                        background: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--text-secondary)",
+                        marginBottom: 12,
+                      }}
+                    >
+                      <Square size={22} strokeWidth={1.75} />
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 5 }}>Blank Slide</div>
+                    <div style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.45 }}>
+                      Add a clean slide matching your current layout
+                    </div>
+                  </div>
+
+                  {/* Choice 2: Choose from Templates */}
+                  <div
+                    className="add-slide-choice-card"
+                    onClick={() => setAddSlideStep("templates")}
+                    style={{
+                      padding: "22px 16px",
+                      borderRadius: 14,
+                      background: "rgba(139, 92, 246, 0.06)",
+                      border: "1px solid rgba(139, 92, 246, 0.3)",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      textAlign: "center",
+                      transition: "all 0.18s ease",
+                      boxShadow: "0 4px 20px rgba(139, 92, 246, 0.1)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 12,
+                        background: "linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.2))",
+                        border: "1px solid rgba(139, 92, 246, 0.4)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--accent-violet-mid)",
+                        marginBottom: 12,
+                      }}
+                    >
+                      <Layout size={22} strokeWidth={1.75} />
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 5 }}>Choose Template</div>
+                    <div style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.45 }}>
+                      Browse curated multi-photo layouts and presets
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* ── Step 2: Compact Template Library Browser ── */
+              <div style={{ display: "flex", flexDirection: "column", minHeight: 0, flex: 1 }}>
+                {/* Header with Back button */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <button
+                      type="button"
+                      className="btn-ghost"
+                      onClick={() => setAddSlideStep("choice")}
+                      style={{ padding: "5px 10px", fontSize: 11.5, gap: 4 }}
+                      title="Back to choices"
+                    >
+                      <ChevronLeft size={14} />
+                      <span>Back</span>
+                    </button>
+                    <div>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>Choose from Templates</h3>
+                      <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 1 }}>Select a layout preset for your new slide</p>
+                    </div>
+                  </div>
+                  <button
+                    className="modal-close-btn"
+                    onClick={() => setAddSlideModalOpen(false)}
+                    style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 4 }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                {/* Search & Category Filter */}
+                <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10 }}>
+                  <div style={{
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    background: "rgba(255, 255, 255, 0.04)",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: 8,
+                    padding: "6px 10px",
+                  }}>
+                    <Search size={14} color="var(--text-muted)" />
+                    <input
+                      type="text"
+                      value={templateSearchQuery}
+                      onChange={(e) => setTemplateSearchQuery(e.target.value)}
+                      placeholder="Search 100+ templates..."
+                      style={{
+                        background: "none",
+                        border: "none",
+                        outline: "none",
+                        color: "#fff",
+                        fontSize: 12,
+                        width: "100%",
+                      }}
+                    />
+                    {templateSearchQuery && (
+                      <button
+                        onClick={() => setTemplateSearchQuery("")}
+                        style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 2 }}
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Category Pills */}
+                <div style={{
+                  display: "flex",
+                  gap: 6,
+                  overflowX: "auto",
+                  paddingBottom: 8,
+                  marginBottom: 10,
+                  scrollbarWidth: "none",
+                }}>
+                  {["All", "Aesthetic", "Minimal", "Film", "Scrapbook", "Travel", "Magazine", "Cinematic"].map((cat) => {
+                    const isActive = templateCategoryFilter.toLowerCase() === cat.toLowerCase();
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => setTemplateCategoryFilter(cat)}
+                        style={{
+                          padding: "4px 10px",
+                          borderRadius: 9999,
+                          fontSize: 11,
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
+                          background: isActive ? "var(--accent-violet-mid)" : "rgba(255, 255, 255, 0.04)",
+                          color: isActive ? "#fff" : "var(--text-secondary)",
+                          border: isActive ? "1px solid var(--accent-violet-mid)" : "1px solid var(--border-subtle)",
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        {cat}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Scrollable Templates Grid */}
+                <div style={{
+                  flex: 1,
+                  maxHeight: 340,
+                  overflowY: "auto",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+                  gap: 10,
+                  padding: 2,
+                  marginBottom: 14,
+                }}>
+                  {PRESET_LAYOUTS.filter((p) => {
+                    const query = templateSearchQuery.trim().toLowerCase();
+                    const matchesSearch =
+                      !query ||
+                      p.name.toLowerCase().includes(query) ||
+                      (p.category && p.category.toLowerCase().includes(query));
+                    const matchesCategory =
+                      templateCategoryFilter === "All" ||
+                      (p.category && p.category.toLowerCase() === templateCategoryFilter.toLowerCase());
+                    return matchesSearch && matchesCategory;
+                  }).map((preset) => {
+                    const isSelected = selectedTemplateForSlide?.layout_id === preset.layout_id;
+                    return (
+                      <div
+                        key={`modal-tpl-${preset.layout_id}`}
+                        onClick={() => setSelectedTemplateForSlide(preset)}
+                        style={{
+                          padding: 6,
+                          borderRadius: 10,
+                          background: isSelected ? "rgba(139, 92, 246, 0.12)" : "rgba(255, 255, 255, 0.02)",
+                          border: isSelected ? "1.5px solid var(--accent-violet-mid)" : "1px solid var(--border-subtle)",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                          position: "relative",
+                        }}
+                      >
+                        <div style={{ position: "relative", width: "100%", aspectRatio: "4/5", borderRadius: 8, overflow: "hidden", marginBottom: 6 }}>
+                          <TemplatePreview preset={preset} active={isSelected} />
+                          {isSelected && (
+                            <div style={{
+                              position: "absolute",
+                              top: 5,
+                              right: 5,
+                              width: 18,
+                              height: 18,
+                              borderRadius: "50%",
+                              background: "var(--accent-violet-mid)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.5)",
+                              zIndex: 5,
+                            }}>
+                              <Check size={11} color="#fff" strokeWidth={3} />
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: isSelected ? "#fff" : "var(--text-secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {preset.name}
+                        </div>
+                        <div style={{ fontSize: 9.5, color: "var(--text-muted)", marginTop: 2 }}>
+                          {preset.slots.length} Photos
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Footer Confirmation Bar */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingTop: 14,
+                  borderTop: "1px solid var(--border-faint)",
+                }}>
+                  <div>
+                    {selectedTemplateForSlide ? (
+                      <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+                        Selected: <strong style={{ color: "#fff" }}>{selectedTemplateForSlide.name}</strong> ({selectedTemplateForSlide.slots.length} photos)
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Select a template above</span>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      type="button"
+                      className="btn-ghost"
+                      onClick={() => setAddSlideModalOpen(false)}
+                      disabled={isAddingSlide}
+                      style={{ padding: "7px 14px", fontSize: 12 }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      onClick={confirmAddSlideFromTemplate}
+                      disabled={!selectedTemplateForSlide || isAddingSlide}
+                      style={{
+                        padding: "7px 16px",
+                        fontSize: 12,
+                        gap: 6,
+                        opacity: !selectedTemplateForSlide || isAddingSlide ? 0.6 : 1,
+                        cursor: !selectedTemplateForSlide || isAddingSlide ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      <Plus size={13} />
+                      <span>{isAddingSlide ? "Adding..." : "Add Slide"}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1074,6 +1074,13 @@ body::before {
   border-color: var(--accent-rose);
 }
 
+.add-slide-choice-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-violet-mid) !important;
+  background: rgba(139, 92, 246, 0.1) !important;
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2) !important;
+}
+
 .carousel-settings-block {
   display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
   border-left: 1px solid var(--border-faint); padding-left: 16px; flex-shrink: 0;
