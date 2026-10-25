@@ -21,6 +21,7 @@ import {
   Lock, Unlock, Maximize2, Minimize2, MousePointer, FlipHorizontal,
   FlipVertical, Crop, Magnet, MoreHorizontal, MoreVertical, Undo2,
   Redo2, Cloud, Sparkle, Smile, Sun, Ratio, CheckCheck, Square,
+  AlignLeft, AlignCenter, AlignRight,
 } from "lucide-react";
 
 interface CaptionPayload {
@@ -188,7 +189,29 @@ function TemplatePreview({ preset, active, className, onSelect }: TemplatePrevie
 }
 
 const INITIAL_SLIDES: CarouselSlide[] = [
-  createSlideFromPreset("slide_1", "grid_2x2"),
+  {
+    ...createSlideFromPreset("slide_1", "grid_2x2"),
+    textElements: [
+      {
+        id: "text_initial_1",
+        text: "Adventure",
+        font: "Playfair Display",
+        color: "#FFFFFF",
+        size: 56,
+        weight: 700,
+        align: "center",
+        letterSpacing: 1,
+        lineHeight: 1.2,
+        opacity: 100,
+        x: 540,
+        y: 675,
+        rotation: 0,
+        shadow: true,
+        locked: false,
+        hidden: false,
+      },
+    ],
+  },
   createSlideFromPreset("slide_2", "wanderlust_pill"),
   createSlideFromPreset("slide_3", "cinematic_letterbox"),
 ];
@@ -223,7 +246,8 @@ export default function Home() {
 
   // Right Inspector active tab
   const [rightInspectorTab, setRightInspectorTab] = useState<"edit" | "layers" | "ai">("edit");
-  const [canvasTool, setCanvasTool] = useState<"select" | "move" | "crop" | "rotate" | "flip" | "fit" | "fill">("select");
+  const [canvasTool, setCanvasTool] = useState<"select" | "move" | "crop" | "rotate" | "flip" | "fit" | "fill" | "text">("select");
+  const [isTextPanelOpen, setIsTextPanelOpen] = useState<boolean>(true);
   const [showAllFilters, setShowAllFilters] = useState<boolean>(false);
 
   // Canvas View Controls
@@ -300,7 +324,11 @@ export default function Home() {
       : { ...DEFAULT_TRANSFORM };
 
   const activeSelectedText: TextElement | undefined =
-    selectedTextId ? textElements.find((t) => t.id === selectedTextId) : undefined;
+    selectedTextId
+      ? textElements.find((t) => t.id === selectedTextId)
+      : (canvasTool === "text" || isTextPanelOpen) && textElements.length > 0
+      ? textElements[0]
+      : undefined;
 
   const activeSelectedSticker: StickerElement | undefined =
     selectedStickerId ? stickers.find((s) => s.id === selectedStickerId) : undefined;
@@ -642,14 +670,14 @@ export default function Home() {
   const handleAddTextElement = (preset?: Partial<TextElement>) => {
     const newText: TextElement = {
       id: `text_${Date.now()}`,
-      text: preset?.text || "YOUR HEADLINE",
-      font: preset?.font || "Plus Jakarta Sans",
+      text: preset?.text || "Adventure",
+      font: preset?.font || "Playfair Display",
       color: preset?.color || "#FFFFFF",
-      size: preset?.size || 42,
-      weight: preset?.weight || 800,
+      size: preset?.size || 56,
+      weight: preset?.weight || 700,
       align: preset?.align || "center",
-      letterSpacing: preset?.letterSpacing || 0,
-      lineHeight: preset?.lineHeight || 1.1,
+      letterSpacing: preset?.letterSpacing || 1,
+      lineHeight: preset?.lineHeight || 1.2,
       opacity: preset?.opacity || 100,
       x: preset?.x || 540,
       y: preset?.y || 675,
@@ -663,6 +691,8 @@ export default function Home() {
       textElements: [...(s.textElements || []), newText],
     }));
     setSelectedLayer({ type: "text", id: newText.id });
+    setCanvasTool("text");
+    setIsTextPanelOpen(true);
     setRightInspectorTab("edit");
     showToast("Added text layer");
   };
@@ -1371,9 +1401,20 @@ export default function Home() {
                     <div className="toolbar-divider" />
 
                     <button
-                      className="toolbar-tool-btn"
-                      onClick={() => handleAddTextElement()}
-                      title="Add text layer"
+                      className={`toolbar-tool-btn${canvasTool === "text" || selectedTextId ? " active" : ""}`}
+                      onClick={() => {
+                        setCanvasTool("text");
+                        setIsTextPanelOpen(true);
+                        setRightInspectorTab("edit");
+                        if (!selectedTextId) {
+                          if (textElements.length > 0) {
+                            setSelectedLayer({ type: "text", id: textElements[0].id });
+                          } else {
+                            handleAddTextElement({ text: "Adventure" });
+                          }
+                        }
+                      }}
+                      title="Text tool"
                     >
                       <Type size={13} />
                       <span>Text</span>
@@ -1405,7 +1446,11 @@ export default function Home() {
                         backgroundColor: activePreset.canvas.background_color || "#080a0f",
                         aspectRatio: carouselRatio === "1080x1080" ? "1/1" : carouselRatio === "1080x1920" ? "9/16" : "4/5",
                       }}
-                      onClick={() => setSelectedLayer(null)}
+                      onClick={() => {
+                        if (canvasTool !== "text") {
+                          setSelectedLayer(null);
+                        }
+                      }}
                     >
                       <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
                         {/* Photo Slots */}
@@ -1569,12 +1614,16 @@ export default function Home() {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedLayer({ type: "text", id: te.id });
+                                setCanvasTool("text");
+                                setIsTextPanelOpen(true);
                                 setRightInspectorTab("edit");
                               }}
                               onMouseDown={(e) => {
                                 if (te.locked) return;
                                 e.stopPropagation();
                                 setSelectedLayer({ type: "text", id: te.id });
+                                setCanvasTool("text");
+                                setIsTextPanelOpen(true);
                                 setDraggingText({ textId: te.id, startX: e.clientX, startY: e.clientY, initialX: te.x, initialY: te.y });
                               }}
                             >
@@ -1762,79 +1811,296 @@ export default function Home() {
                     {/* ── TAB 1: EDIT (CONTEXTUAL) ────────────────────────── */}
                     {rightInspectorTab === "edit" && (
                       <>
-                        {/* When Text Layer Selected */}
-                        {selectedTextId && activeSelectedText ? (
-                          <div className="inspector-section">
-                            <div className="inspector-section-header">
-                              <span className="inspector-section-label">Typography</span>
+                        {/* 1. Text Settings Section (Persistent accordion matching reference mockup) */}
+                        <div className="inspector-section">
+                          <div className="inspector-section-header">
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <Type size={13} color="var(--accent-violet-mid)" />
+                              <span className="inspector-section-label" style={{ color: "var(--text-primary)", fontSize: 12, fontWeight: 700, textTransform: "none", letterSpacing: "normal" }}>Text</span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              {activeSelectedText && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteTextElement(activeSelectedText.id)}
+                                  style={{ background: "none", border: "none", color: "var(--accent-rose)", fontSize: 10, cursor: "pointer" }}
+                                  title="Delete text layer"
+                                >
+                                  Delete
+                                </button>
+                              )}
                               <button
-                                onClick={() => handleDeleteTextElement(selectedTextId)}
-                                style={{ background: "none", border: "none", color: "var(--accent-rose)", fontSize: 10, cursor: "pointer" }}
+                                type="button"
+                                onClick={() => setIsTextPanelOpen(!isTextPanelOpen)}
+                                className="filter-see-all-btn"
+                                title={isTextPanelOpen ? "Collapse text panel" : "Expand text panel"}
                               >
-                                Delete
+                                <ChevronDown size={14} style={{ transform: isTextPanelOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s ease" }} />
                               </button>
                             </div>
-
-                            <div style={{ marginBottom: 12 }}>
-                              <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 4 }}>Text Content</label>
-                              <input
-                                type="text"
-                                value={activeSelectedText.text}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  updateActiveSlide((s) => ({
-                                    ...s,
-                                    textElements: (s.textElements || []).map((t) => t.id === selectedTextId ? { ...t, text: val } : t),
-                                  }));
-                                }}
-                                style={{ width: "100%", padding: "7px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid var(--border-subtle)", color: "#fff", fontSize: 12 }}
-                              />
-                            </div>
-
-                            <div style={{ marginBottom: 12 }}>
-                              <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 4 }}>Font Family</label>
-                              <select
-                                value={activeSelectedText.font}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  updateActiveSlide((s) => ({
-                                    ...s,
-                                    textElements: (s.textElements || []).map((t) => t.id === selectedTextId ? { ...t, font: val } : t),
-                                  }));
-                                }}
-                                className="ratio-select"
-                                style={{ width: "100%" }}
-                              >
-                                {["Caveat", "Plus Jakarta Sans", "Outfit", "Inter", "Playfair Display", "Cinzel", "JetBrains Mono"].map((f) => (
-                                  <option key={f} value={f}>{f}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div className="slider-row">
-                              <div className="slider-header">
-                                <span>Font Size</span>
-                                <span className="slider-value">{activeSelectedText.size}px</span>
-                              </div>
-                              <input
-                                type="range"
-                                min={16}
-                                max={100}
-                                value={activeSelectedText.size}
-                                onChange={(e) => {
-                                  const val = Number(e.target.value);
-                                  updateActiveSlide((s) => ({
-                                    ...s,
-                                    textElements: (s.textElements || []).map((t) => t.id === selectedTextId ? { ...t, size: val } : t),
-                                  }));
-                                }}
-                                className="custom-range-slider"
-                              />
-                            </div>
                           </div>
-                        ) : (
-                          /* When Slot Selected or Default (Image Settings) */
-                          <>
+
+                          {isTextPanelOpen && (
+                            <div style={{ marginTop: 8 }}>
+                              {activeSelectedText ? (
+                                <>
+                                  {/* Text Content Input */}
+                                  <div style={{ marginBottom: 10 }}>
+                                    <input
+                                      type="text"
+                                      value={activeSelectedText.text}
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        updateActiveSlide((s) => ({
+                                          ...s,
+                                          textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, text: val } : t),
+                                        }));
+                                      }}
+                                      placeholder="Type your text..."
+                                      style={{
+                                        width: "100%",
+                                        padding: "8px 10px",
+                                        borderRadius: 6,
+                                        background: "rgba(255,255,255,0.04)",
+                                        border: "1px solid var(--border-subtle)",
+                                        color: "#ffffff",
+                                        fontSize: 12.5,
+                                        fontWeight: 500,
+                                      }}
+                                    />
+                                  </div>
+
+                                  {/* Font Family & Size Row */}
+                                  <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+                                    <select
+                                      value={activeSelectedText.font}
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        updateActiveSlide((s) => ({
+                                          ...s,
+                                          textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, font: val } : t),
+                                        }));
+                                      }}
+                                      className="ratio-select"
+                                      style={{ flex: 1, padding: "6px 8px", fontSize: 11.5 }}
+                                    >
+                                      {["Playfair Display", "Plus Jakarta Sans", "Caveat", "Outfit", "Inter", "Cinzel", "JetBrains Mono"].map((f) => (
+                                        <option key={f} value={f}>{f}</option>
+                                      ))}
+                                    </select>
+                                    <div style={{ width: 62, display: "flex", alignItems: "center" }}>
+                                      <input
+                                        type="number"
+                                        min={14}
+                                        max={140}
+                                        value={activeSelectedText.size}
+                                        onChange={(e) => {
+                                          const val = Math.max(10, Math.min(160, Number(e.target.value) || 14));
+                                          updateActiveSlide((s) => ({
+                                            ...s,
+                                            textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, size: val } : t),
+                                          }));
+                                        }}
+                                        style={{
+                                          width: "100%",
+                                          padding: "6px 4px",
+                                          borderRadius: 6,
+                                          background: "rgba(255,255,255,0.04)",
+                                          border: "1px solid var(--border-subtle)",
+                                          color: "#fff",
+                                          fontSize: 11.5,
+                                          textAlign: "center",
+                                        }}
+                                        title="Font size (px)"
+                                      />
+                                    </div>
+                                  </div>
+
+                                  {/* Formatting Bar: B, I, Alignments, Color */}
+                                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 10 }}>
+                                    <button
+                                      type="button"
+                                      className={`btn-ghost${(activeSelectedText.weight || 400) >= 700 ? " align-active" : ""}`}
+                                      onClick={() => {
+                                        const nextWeight = (activeSelectedText.weight || 400) >= 700 ? 400 : 700;
+                                        updateActiveSlide((s) => ({
+                                          ...s,
+                                          textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, weight: nextWeight } : t),
+                                        }));
+                                      }}
+                                      style={{ width: 28, height: 28, padding: 0, justifyContent: "center", fontWeight: 700, fontSize: 12 }}
+                                      title="Bold"
+                                    >
+                                      B
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      className={`btn-ghost${activeSelectedText.font === "Caveat" ? " align-active" : ""}`}
+                                      onClick={() => {
+                                        const nextFont = activeSelectedText.font === "Caveat" ? "Playfair Display" : "Caveat";
+                                        updateActiveSlide((s) => ({
+                                          ...s,
+                                          textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, font: nextFont } : t),
+                                        }));
+                                      }}
+                                      style={{ width: 28, height: 28, padding: 0, justifyContent: "center", fontStyle: "italic", fontSize: 12 }}
+                                      title="Script / Italic style"
+                                    >
+                                      I
+                                    </button>
+
+                                    <div className="toolbar-divider" style={{ margin: "0 2px" }} />
+
+                                    <button
+                                      type="button"
+                                      className={`btn-ghost${activeSelectedText.align === "left" ? " align-active" : ""}`}
+                                      onClick={() => {
+                                        updateActiveSlide((s) => ({
+                                          ...s,
+                                          textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, align: "left" } : t),
+                                        }));
+                                      }}
+                                      style={{ width: 28, height: 28, padding: 0, justifyContent: "center" }}
+                                      title="Align Left"
+                                    >
+                                      <AlignLeft size={12} />
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      className={`btn-ghost${(!activeSelectedText.align || activeSelectedText.align === "center") ? " align-active" : ""}`}
+                                      onClick={() => {
+                                        updateActiveSlide((s) => ({
+                                          ...s,
+                                          textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, align: "center" } : t),
+                                        }));
+                                      }}
+                                      style={{ width: 28, height: 28, padding: 0, justifyContent: "center" }}
+                                      title="Align Center"
+                                    >
+                                      <AlignCenter size={12} />
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      className={`btn-ghost${activeSelectedText.align === "right" ? " align-active" : ""}`}
+                                      onClick={() => {
+                                        updateActiveSlide((s) => ({
+                                          ...s,
+                                          textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, align: "right" } : t),
+                                        }));
+                                      }}
+                                      style={{ width: 28, height: 28, padding: 0, justifyContent: "center" }}
+                                      title="Align Right"
+                                    >
+                                      <AlignRight size={12} />
+                                    </button>
+
+                                    <div style={{ flex: 1 }} />
+
+                                    <label
+                                      style={{
+                                        position: "relative",
+                                        width: 22,
+                                        height: 22,
+                                        borderRadius: "50%",
+                                        backgroundColor: activeSelectedText.color || "#ffffff",
+                                        border: "2px solid rgba(255,255,255,0.6)",
+                                        cursor: "pointer",
+                                        boxShadow: "0 0 6px rgba(0,0,0,0.5)",
+                                        display: "inline-block",
+                                        flexShrink: 0,
+                                      }}
+                                      title="Text Color"
+                                    >
+                                      <input
+                                        type="color"
+                                        value={activeSelectedText.color || "#ffffff"}
+                                        onChange={(e) => {
+                                          const col = e.target.value;
+                                          updateActiveSlide((s) => ({
+                                            ...s,
+                                            textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, color: col } : t),
+                                          }));
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
+                                      />
+                                    </label>
+                                  </div>
+
+                                  {/* Letter Spacing */}
+                                  <div className="slider-row">
+                                    <div className="slider-header">
+                                      <span>Letter spacing</span>
+                                      <span className="slider-value">{activeSelectedText.letterSpacing ?? 1}px</span>
+                                    </div>
+                                    <input
+                                      type="range"
+                                      min={-2}
+                                      max={12}
+                                      step={0.5}
+                                      value={activeSelectedText.letterSpacing ?? 1}
+                                      onChange={(e) => {
+                                        const val = Number(e.target.value);
+                                        updateActiveSlide((s) => ({
+                                          ...s,
+                                          textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, letterSpacing: val } : t),
+                                        }));
+                                      }}
+                                      className="custom-range-slider"
+                                    />
+                                  </div>
+
+                                  {/* Line Spacing */}
+                                  <div className="slider-row">
+                                    <div className="slider-header">
+                                      <span>Line spacing</span>
+                                      <span className="slider-value">{activeSelectedText.lineHeight ?? 1.2}</span>
+                                    </div>
+                                    <input
+                                      type="range"
+                                      min={0.8}
+                                      max={2.5}
+                                      step={0.1}
+                                      value={activeSelectedText.lineHeight ?? 1.2}
+                                      onChange={(e) => {
+                                        const val = Number(e.target.value);
+                                        updateActiveSlide((s) => ({
+                                          ...s,
+                                          textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, lineHeight: val } : t),
+                                        }));
+                                      }}
+                                      className="custom-range-slider"
+                                    />
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    className="btn-ghost"
+                                    onClick={() => handleAddTextElement({ text: "THROUGH MY LENS", size: 28, y: 750 })}
+                                    style={{ width: "100%", justifyContent: "center", gap: 6, padding: "6px 10px", marginTop: 8, fontSize: 11 }}
+                                  >
+                                    <Plus size={12} />
+                                    <span>Add Another Text</span>
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="btn-ghost"
+                                  onClick={() => handleAddTextElement({ text: "Adventure" })}
+                                  style={{ width: "100%", justifyContent: "center", gap: 6, padding: "8px 12px", fontSize: 11.5 }}
+                                >
+                                  <Plus size={13} />
+                                  <span>Add Text Layer</span>
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Image Settings Section */}
                             {/* 1. Image Settings Section (List of Slots) */}
                             <div className="inspector-section">
                               <div className="inspector-section-header">
@@ -2121,8 +2387,6 @@ export default function Home() {
                                 })}
                               </div>
                             </div>
-                          </>
-                        )}
                       </>
                     )}
 
