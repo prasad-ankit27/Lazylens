@@ -1,36 +1,41 @@
 import { MongoClient, Db, Collection, ObjectId } from "mongodb";
 
-const uri = process.env.MONGO_URI || "";
-const options = {};
-
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
-
 declare global {
-  // Allow global `var` declarations in TypeScript
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-if (!uri) {
-  console.warn("[MongoDB] Warning: MONGO_URI environment variable is not defined.");
-}
+let client: MongoClient | null = null;
+let clientPromise: Promise<MongoClient> | null = null;
 
-if (process.env.NODE_ENV === "development") {
-  // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
+export function getMongoClientPromise(): Promise<MongoClient> {
+  const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+  if (!uri || !uri.trim()) {
+    const errorMsg =
+      "Missing MONGO_URI: The MONGO_URI environment variable is not defined on this service. Please set MONGO_URI in your Render service environment variables.";
+    console.error(`[MongoDB Error] ${errorMsg}`);
+    throw new Error(errorMsg);
   }
-  clientPromise = global._mongoClientPromise;
-} else {
-  // In production mode, it's best to not use a global variable.
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+
+  if (process.env.NODE_ENV === "development") {
+    // In development mode, use a global variable to preserve connection across HMR reloads
+    if (!global._mongoClientPromise) {
+      const devClient = new MongoClient(uri);
+      global._mongoClientPromise = devClient.connect();
+    }
+    return global._mongoClientPromise;
+  }
+
+  // In production mode, reuse clientPromise
+  if (!clientPromise) {
+    client = new MongoClient(uri);
+    clientPromise = client.connect();
+  }
+  return clientPromise;
 }
 
 export async function getDb(): Promise<Db> {
-  const c = await clientPromise;
+  const c = await getMongoClientPromise();
   return c.db("lazylens");
 }
 
@@ -46,7 +51,7 @@ export interface UserDocument {
 
 export interface ProjectDocument {
   _id?: ObjectId;
-  userId: string; // string representation of user's _id
+  userId: string;
   title: string;
   slidesCount: number;
   thumbnail: string;
@@ -88,4 +93,5 @@ export async function getProjectsCollection(): Promise<Collection<ProjectDocumen
   return db.collection<ProjectDocument>("projects");
 }
 
-export default clientPromise;
+export { ObjectId };
+export default getMongoClientPromise;

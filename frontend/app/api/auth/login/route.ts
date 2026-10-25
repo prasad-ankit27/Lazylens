@@ -78,8 +78,15 @@ export async function POST(req: Request) {
     return res;
   } catch (err: any) {
     console.error("[Login Error]", err);
+    const msg = err?.message || "";
+    if (msg.includes("Missing MONGO_URI") || msg.includes("MONGO_URI") || msg.includes("Invalid scheme") || msg.includes("topology")) {
+      return NextResponse.json(
+        { error: "Database not connected. Please ensure MONGO_URI is added to your Render frontend environment variables." },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
-      { error: "An unexpected error occurred during login. Please try again." },
+      { error: err?.message || "An unexpected error occurred during login. Please try again." },
       { status: 500 }
     );
   }
