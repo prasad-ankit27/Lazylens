@@ -30,6 +30,16 @@ interface CaptionSuggestion {
   text: string;
 }
 
+interface TemplateRecommendation {
+  layout_id: string;
+  name: string;
+  category?: string;
+  photo_count: number;
+  match_reason: string;
+  score: number;
+  preset: LayoutPreset;
+}
+
 interface CaptionPayload {
   summary?: string;
   aesthetic: string;
@@ -314,6 +324,16 @@ export default function Home() {
   const [captionError, setCaptionError] = useState<string | null>(null);
   const [sceneSummary, setSceneSummary] = useState<string | null>(null);
   const [copiedCaptionIdx, setCopiedCaptionIdx] = useState<number | null>(null);
+
+  // Dedicated Suggest Templates state (Phase 2)
+  const [suggestedTemplates, setSuggestedTemplates] = useState<TemplateRecommendation[]>([]);
+  const [recentTemplateIds, setRecentTemplateIds] = useState<string[]>([]);
+  const [isSuggestingTemplates, setIsSuggestingTemplates] = useState<boolean>(false);
+  const [templateLoadingStep, setTemplateLoadingStep] = useState<string>("Analyzing image style & composition…");
+  const [templateError, setTemplateError] = useState<string | null>(null);
+  const [selectedRecommendation, setSelectedRecommendation] = useState<TemplateRecommendation | null>(null);
+  const [previewModalTemplate, setPreviewModalTemplate] = useState<LayoutPreset | null>(null);
+  const [confirmApplyModalTemplate, setConfirmApplyModalTemplate] = useState<LayoutPreset | null>(null);
 
   const [mediaLibraryPool, setMediaLibraryPool] = useState<PhotoItem[]>([
     ...DEFAULT_DEMO_PHOTOS,
@@ -1196,6 +1216,180 @@ export default function Home() {
     showToast("Added caption as text layer to slide");
   };
 
+  // Dedicated Suggest Templates Handlers (Phase 2)
+  const handleSuggestTemplates = async (isRefresh: boolean = false) => {
+    if (isSuggestingTemplates) return;
+
+    setIsSuggestingTemplates(true);
+    setTemplateError(null);
+    setTemplateLoadingStep("Analyzing image style & composition…");
+
+    const imageUrls = (activeSlide?.photos || [])
+      .map((p) => p.url)
+      .filter((u): u is string => typeof u === "string" && u.trim().length > 0);
+
+    const stepTimer = setTimeout(() => {
+      setTemplateLoadingStep("Scoring library layouts & visual balance…");
+    }, 1800);
+
+    try {
+      const res = await fetch("/api/ai/suggest-templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          images: imageUrls,
+          recent_template_ids: isRefresh ? recentTemplateIds : [],
+          current_preset_id: activePreset?.layout_id || "",
+          current_photo_count: activeSlide?.photos?.length || 4,
+          scene_summary: sceneSummary || null,
+        }),
+      });
+
+      clearTimeout(stepTimer);
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `Template recommendation failed (${res.status})`);
+      }
+
+      if (data.recommendations && Array.isArray(data.recommendations) && data.recommendations.length > 0) {
+        setSuggestedTemplates(data.recommendations);
+        if (data.scene_summary && !sceneSummary) {
+          setSceneSummary(data.scene_summary);
+        }
+
+        // Track recent template IDs to avoid duplicate recommendations on refresh
+        const newIds = data.recommendations.map((r: TemplateRecommendation) => r.layout_id);
+        setRecentTemplateIds((prev) => {
+          const combined = [...prev, ...newIds];
+          return combined.slice(-20);
+        });
+
+        if (data.recommendations.length > 0) {
+          setSelectedRecommendation(data.recommendations[0]);
+        }
+
+        showToast(isRefresh ? "Refreshed layout recommendations" : `Found ${data.recommendations.length} matching layouts`);
+      } else {
+        throw new Error("No matching templates found for current collection.");
+      }
+    } catch (err: any) {
+      console.error("Template recommendation error:", err);
+      setTemplateError(err?.message || "Failed to recommend templates. Please check service status.");
+      showToast("AI Service Error: Failed to recommend templates");
+    } finally {
+      clearTimeout(stepTimer);
+      setIsSuggestingTemplates(false);
+    }
+  };
+
+  const handleInitiateApplyTemplate = (preset: LayoutPreset) => {
+    setSelectedRecommendation((prev) =>
+      prev?.preset?.layout_id === preset.layout_id
+        ? prev
+        : {
+            layout_id: preset.layout_id,
+            name: preset.name,
+            category: preset.category || "General",
+            photo_count: preset.slots.length,
+            match_reason: `Matches aesthetic for ${preset.slots.length} photos`,
+            score: 90,
+            preset,
+          }
+    );
+
+    // If active slide has content or different slot count, show safe confirmation dialog
+    if (activeSlide && (isSlideEdited(activeSlide) || activeSlide.photos.length !== preset.slots.length || activeSlide.presetId !== preset.layout_id)) {
+      setConfirmApplyModalTemplate(preset);
+    } else {
+      handleApplyTemplate(preset, "replace");
+    }
+  };
+
+  const handleApplyTemplate = (preset: LayoutPreset, mode: "replace" | "new_slide") => {
+    if (mode === "new_slide") {
+      const nextId = `slide_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      // Map current slide's photos into new slide slots
+      const newPhotos: PhotoItem[] = preset.slots.map((_, sIdx) => {
+        if (activeSlide?.photos && activeSlide.photos[sIdx]) {
+          return {
+            ...activeSlide.photos[sIdx],
+            id: `photo_${preset.layout_id}_${nextId}_${sIdx}`,
+          };
+        }
+        return {
+          id: `photo_${preset.layout_id}_${nextId}_${sIdx}`,
+          url: getPresetSlotImageUrl(preset, sIdx),
+          file: null,
+          name: `${preset.name} - Slot #${sIdx + 1}`,
+        };
+      });
+
+      const newSlide: CarouselSlide = {
+        id: nextId,
+        presetId: preset.layout_id,
+        photos: newPhotos,
+        alignments: preset.slots.map(() => "center" as const),
+        transforms: preset.slots.map(() => ({ ...DEFAULT_TRANSFORM })),
+        textElements: (activeSlide?.textElements || []).map((t) => ({ ...t, id: `txt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}` })),
+        stickers: (activeSlide?.stickers || []).map((s) => ({ ...s, id: `stk_${Date.now()}_${Math.random().toString(36).substring(2, 7)}` })),
+      };
+
+      setSlides((prev) => {
+        const next = [...prev, newSlide];
+        pushHistory(next);
+        return next;
+      });
+      setActiveSlideIndex(slides.length);
+      setSelectedLayer({ type: "slot", id: 0 });
+      showToast(`Added new slide with "${preset.name}"`);
+    } else {
+      // Replace layout of current slide while preserving existing photos and text elements
+      const updatedPhotos: PhotoItem[] = preset.slots.map((_, sIdx) => {
+        if (activeSlide?.photos && activeSlide.photos[sIdx]) {
+          return activeSlide.photos[sIdx];
+        }
+        return {
+          id: `photo_${preset.layout_id}_${activeSlide?.id || "slide"}_${sIdx}`,
+          url: getPresetSlotImageUrl(preset, sIdx),
+          file: null,
+          name: `${preset.name} - Slot #${sIdx + 1}`,
+        };
+      });
+
+      const updatedTransforms: SlotTransform[] = preset.slots.map((_, sIdx) => {
+        if (activeSlide?.transforms && activeSlide.transforms[sIdx]) {
+          return { ...activeSlide.transforms[sIdx] };
+        }
+        return { ...DEFAULT_TRANSFORM };
+      });
+
+      const updatedAlignments = preset.slots.map((_, sIdx) => {
+        return (activeSlide?.alignments && activeSlide.alignments[sIdx]) || "center";
+      });
+
+      setSlides((prev) => {
+        const next = prev.map((slide, idx) => {
+          if (idx !== activeSlideIndex) return slide;
+          return {
+            ...slide,
+            presetId: preset.layout_id,
+            photos: updatedPhotos,
+            transforms: updatedTransforms,
+            alignments: updatedAlignments,
+          };
+        });
+        pushHistory(next);
+        return next;
+      });
+      setSelectedLayer({ type: "slot", id: 0 });
+      showToast(`Applied "${preset.name}" to Slide ${activeSlideIndex + 1}`);
+    }
+
+    setConfirmApplyModalTemplate(null);
+    setPreviewModalTemplate(null);
+  };
+
   // AI Actions Trigger
   const handleTriggerAiAction = async (action: "captions" | "layouts" | "enhance" | "bg" | "hashtags") => {
     setActiveAiModal(action);
@@ -1204,6 +1398,14 @@ export default function Home() {
       // Trigger context-aware caption generation if not already generated
       if (generatedCaptions.length === 0 && !isGeneratingCaptions) {
         handleGenerateCaptions(false);
+      }
+      return;
+    }
+
+    if (action === "layouts") {
+      // Trigger context-aware template recommendations if not already generated
+      if (suggestedTemplates.length === 0 && !isSuggestingTemplates) {
+        handleSuggestTemplates(false);
       }
       return;
     }
@@ -1229,10 +1431,6 @@ export default function Home() {
         if (action === "hashtags") {
           setAiSuggestions({
             tags: ["#photogram", "#creativeflow", "#visualstory", "#lazylens", "#contentcreator", "#aestheticpost"],
-          });
-        } else if (action === "layouts") {
-          setAiSuggestions({
-            layouts: PRESET_LAYOUTS.filter((p) => p.slots.length === activePreset.slots.length).slice(0, 4),
           });
         }
       }
@@ -2909,6 +3107,194 @@ export default function Home() {
                               </div>
                             )}
                           </div>
+                        ) : activeAiModal === "layouts" ? (
+                          <div className="ai-layouts-view">
+                            {/* Top Back Navigation */}
+                            <div className="ai-captions-nav">
+                              <button className="ai-back-btn" onClick={() => setActiveAiModal(null)}>
+                                <ChevronLeft size={14} /> Back to AI Tools
+                              </button>
+                              <span className="ai-badge-model" style={{ color: "#10b981", borderColor: "rgba(16, 185, 129, 0.3)" }}>
+                                Style & Geometry AI
+                              </span>
+                            </div>
+
+                            {/* Section Header */}
+                            <div className="ai-captions-header">
+                              <div className="ai-captions-title-row">
+                                <div className="ai-captions-title">Suggested Templates</div>
+                              </div>
+                              <div className="ai-captions-subtitle">
+                                Matched to {activeSlide.photos.length} photos on Slide {activeSlideIndex + 1}
+                              </div>
+
+                              {/* Mini Photos Preview Strip */}
+                              <div className="ai-photos-preview-strip">
+                                {activeSlide.photos.map((p, idx) => (
+                                  <div key={`layout-strip-${p.id || idx}`} className="ai-strip-thumb" title={p.name || `Photo #${idx + 1}`}>
+                                    <img
+                                      src={p.url}
+                                      alt=""
+                                      onError={(e) => {
+                                        (e.currentTarget as HTMLImageElement).src = "/demo/demo1.jpg";
+                                      }}
+                                    />
+                                    <span className="ai-strip-badge">{idx + 1}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Loading State */}
+                            {isSuggestingTemplates && (
+                              <div className="ai-captions-loading">
+                                <div className="ai-loading-spinner-wrap" style={{ color: "#10b981" }}>
+                                  <RotateCw size={20} className="ai-spin-icon" />
+                                </div>
+                                <div className="ai-loading-step-text">{templateLoadingStep}</div>
+                                <div className="ai-loading-subtext">Evaluating color harmony, lighting & framing balance</div>
+                                <div className="ai-skeleton-stack">
+                                  {[1, 2, 3, 4].map((n) => (
+                                    <div key={n} className="ai-caption-skeleton" style={{ height: 64 }} />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Error State */}
+                            {!isSuggestingTemplates && templateError && (
+                              <div className="ai-caption-error-box">
+                                <div className="ai-error-header">
+                                  <AlertCircle size={16} className="ai-error-icon" />
+                                  <span className="ai-error-title">Recommendation Unavailable</span>
+                                </div>
+                                <p className="ai-error-desc">{templateError}</p>
+                                <button
+                                  className="btn-retry"
+                                  onClick={() => handleSuggestTemplates(false)}
+                                >
+                                  <RotateCw size={13} /> Retry Search
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Recommendations List */}
+                            {!isSuggestingTemplates && !templateError && suggestedTemplates.length > 0 && (
+                              <div className="ai-layouts-results">
+                                <div className="ai-results-bar">
+                                  <span className="ai-results-count" style={{ color: "#10b981" }}>
+                                    {suggestedTemplates.length} Top Matches
+                                  </span>
+                                  <button
+                                    className="ai-refresh-btn"
+                                    onClick={() => handleSuggestTemplates(true)}
+                                    disabled={isSuggestingTemplates}
+                                    title="Recalculate layout recommendations with new variations"
+                                  >
+                                    <RotateCw size={12} /> Refresh
+                                  </button>
+                                </div>
+
+                                <div className="ai-layouts-cards-list">
+                                  {suggestedTemplates.map((rec) => {
+                                    const isSelected = selectedRecommendation?.layout_id === rec.layout_id;
+                                    const categoryColors: Record<string, { bg: string; color: string; border: string }> = {
+                                      minimalist: { bg: "rgba(59, 130, 246, 0.12)", color: "#60a5fa", border: "rgba(59, 130, 246, 0.3)" },
+                                      film: { bg: "rgba(245, 158, 11, 0.12)", color: "#fbbf24", border: "rgba(245, 158, 11, 0.3)" },
+                                      editorial: { bg: "rgba(168, 85, 247, 0.12)", color: "#c084fc", border: "rgba(168, 85, 247, 0.3)" },
+                                      scrapbook: { bg: "rgba(244, 63, 94, 0.12)", color: "#fb7185", border: "rgba(244, 63, 94, 0.3)" },
+                                      polaroid: { bg: "rgba(16, 185, 129, 0.12)", color: "#34d399", border: "rgba(16, 185, 129, 0.3)" },
+                                    };
+                                    const catStyle = categoryColors[(rec.category || "minimalist").toLowerCase()] || categoryColors.minimalist;
+
+                                    return (
+                                      <div
+                                        key={`rec-${rec.layout_id}`}
+                                        className={`ai-layout-card-item${isSelected ? " selected" : ""}`}
+                                        onClick={() => setSelectedRecommendation(rec)}
+                                      >
+                                        {/* Thumbnail Preview from real Template library */}
+                                        <div className="ai-layout-card-thumb">
+                                          <TemplatePreview preset={rec.preset} />
+                                        </div>
+
+                                        {/* Details */}
+                                        <div className="ai-layout-card-info">
+                                          <div className="ai-layout-card-title-row">
+                                            <span className="ai-layout-card-name" title={rec.name}>{rec.name}</span>
+                                            <span
+                                              className="ai-layout-cat-pill"
+                                              style={{ background: catStyle.bg, color: catStyle.color, borderColor: catStyle.border }}
+                                            >
+                                              {rec.category}
+                                            </span>
+                                          </div>
+
+                                          <div className="ai-layout-card-meta">
+                                            <span className="ai-layout-slots-badge">{rec.photo_count} Slots</span>
+                                            <span style={{ fontSize: 9.5, color: "#10b981", fontWeight: 600 }}>
+                                              {Math.round(rec.score)}% Match
+                                            </span>
+                                          </div>
+
+                                          <p className="ai-layout-card-reason" title={rec.match_reason}>
+                                            {rec.match_reason}
+                                          </p>
+
+                                          <div className="ai-layout-card-actions">
+                                            <button
+                                              className="ai-layout-action-btn ai-layout-preview-btn"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                setPreviewModalTemplate(rec.preset);
+                                              }}
+                                              title="Preview how your photos look in this template"
+                                            >
+                                              <Eye size={11} /> Preview
+                                            </button>
+
+                                            <button
+                                              className="ai-layout-action-btn ai-layout-apply-btn"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleInitiateApplyTemplate(rec.preset);
+                                              }}
+                                              title="Apply this template to your post"
+                                            >
+                                              <Sparkles size={11} /> Apply
+                                            </button>
+                                          </div>
+                                        </div>
+
+                                        {isSelected && (
+                                          <div className="ai-layout-badge-selected">
+                                            <Check size={10} color="#fff" strokeWidth={3} />
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Empty State before first generation */}
+                            {!isSuggestingTemplates && !templateError && suggestedTemplates.length === 0 && (
+                              <div className="ai-captions-empty">
+                                <p className="ai-empty-desc">
+                                  Analyze all images in this slide together to find 4–5 context-aware templates matching your post's visual style, lighting, and composition.
+                                </p>
+                                <button
+                                  className="btn-primary"
+                                  style={{ width: "100%", justifyContent: "center", marginTop: 8, background: "#10b981", borderColor: "#10b981" }}
+                                  onClick={() => handleSuggestTemplates(false)}
+                                  disabled={isSuggestingTemplates}
+                                >
+                                  <Sparkles size={14} /> Suggest Templates
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         ) : (
                           <>
                             <div className="inspector-section-header">
@@ -2939,13 +3325,25 @@ export default function Home() {
                                 </div>
                               </div>
 
-                              <div className="ai-tool-card" onClick={() => handleTriggerAiAction("layouts")}>
+                              <div
+                                className="ai-tool-card"
+                                onClick={() => {
+                                  setActiveAiModal("layouts");
+                                  if (suggestedTemplates.length === 0 && !isSuggestingTemplates) {
+                                    handleSuggestTemplates(false);
+                                  }
+                                }}
+                              >
                                 <div className="ai-card-icon-box" style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981" }}>
                                   <Layout size={16} />
                                 </div>
                                 <div className="ai-card-info">
                                   <div className="ai-card-title">Suggest Layouts</div>
-                                  <div className="ai-card-desc">Get alternative design variations for {activePreset.slots.length} photos</div>
+                                  <div className="ai-card-desc">
+                                    {suggestedTemplates.length > 0
+                                      ? `${suggestedTemplates.length} recommendations ready • Click to view`
+                                      : `Get alternative design variations for ${activePreset.slots.length} photos`}
+                                  </div>
                                 </div>
                               </div>
 
@@ -3005,23 +3403,6 @@ export default function Home() {
                                   </div>
                                 )}
 
-                                {activeAiModal === "layouts" && (
-                                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                                    {aiSuggestions.layouts?.map((l: LayoutPreset) => (
-                                      <button
-                                        key={l.layout_id}
-                                        className="btn-ghost"
-                                        onClick={() => {
-                                          handleSelectPreset(l.layout_id);
-                                          setActiveAiModal(null);
-                                        }}
-                                        style={{ fontSize: 10, padding: 6 }}
-                                      >
-                                        {l.name}
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
                               </div>
                             )}
                           </>
@@ -3639,6 +4020,290 @@ export default function Home() {
                   <button className="modal-close-action" onClick={() => setIsExportModalOpen(false)}>Close Preview</button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Phase 2: Recommended Template Interactive Preview Modal ───── */}
+      {previewModalTemplate && (
+        <div
+          className="modal-overlay"
+          onClick={() => setPreviewModalTemplate(null)}
+          style={{ zIndex: 130 }}
+        >
+          <div
+            className="modal-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: 640,
+              width: "92%",
+              maxHeight: "90vh",
+              padding: 24,
+              background: "rgba(12, 14, 24, 0.98)",
+              border: "1px solid rgba(16, 185, 129, 0.35)",
+              boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.15)",
+              borderRadius: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(16, 185, 129, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}>
+                  <Eye size={18} />
+                </div>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}>
+                      {previewModalTemplate.name}
+                    </h3>
+                    <span className="ai-layout-cat-pill" style={{ background: "rgba(16, 185, 129, 0.15)", color: "#34d399", borderColor: "rgba(16, 185, 129, 0.3)" }}>
+                      {previewModalTemplate.category}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 11.5, color: "var(--text-muted)", margin: "2px 0 0" }}>
+                    Interactive Preview — Your project is untouched until applied
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPreviewModalTemplate(null)}
+                style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 6 }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Main Preview Area */}
+            <div style={{ display: "flex", gap: 20, alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+              <div
+                style={{
+                  position: "relative",
+                  width: 260,
+                  aspectRatio: "4 / 5",
+                  background: previewModalTemplate.canvas?.background_color || "#121214",
+                  borderRadius: 10,
+                  overflow: "hidden",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.6)",
+                  flexShrink: 0,
+                }}
+              >
+                {previewModalTemplate.slots.map((slot, sIdx) => {
+                  const photo = activeSlide?.photos?.[sIdx] || { url: getPresetSlotImageUrl(previewModalTemplate, sIdx) };
+                  const canvasW = previewModalTemplate.canvas?.width || 1080;
+                  const canvasH = previewModalTemplate.canvas?.height || 1350;
+                  return (
+                    <div
+                      key={`preview-slot-${sIdx}`}
+                      style={{
+                        position: "absolute",
+                        left: `${(slot.x / canvasW) * 100}%`,
+                        top: `${(slot.y / canvasH) * 100}%`,
+                        width: `${(slot.width / canvasW) * 100}%`,
+                        height: `${(slot.height / canvasH) * 100}%`,
+                        borderRadius: slot.border_radius ? `${slot.border_radius / 3.5}px` : "2px",
+                        overflow: "hidden",
+                        background: "#1c1e28",
+                      }}
+                    >
+                      <img
+                        src={photo.url}
+                        alt=""
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = "/demo/demo1.jpg";
+                        }}
+                      />
+                      <span
+                        style={{
+                          position: "absolute",
+                          top: 4,
+                          left: 4,
+                          background: "rgba(0,0,0,0.65)",
+                          padding: "1px 5px",
+                          borderRadius: 3,
+                          fontSize: 8.5,
+                          color: "#fff",
+                          fontFamily: "var(--font-mono)",
+                        }}
+                      >
+                        Slot {sIdx + 1}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Details & Specs Column */}
+              <div style={{ flex: 1, minWidth: 220, display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ background: "rgba(255,255,255,0.03)", padding: 12, borderRadius: 10, border: "1px solid var(--border-subtle)" }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4 }}>
+                    WHY THIS TEMPLATE MATCHES
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--text-primary)", lineHeight: 1.4 }}>
+                    {selectedRecommendation?.preset?.layout_id === previewModalTemplate.layout_id
+                      ? selectedRecommendation.match_reason
+                      : `Balanced ${previewModalTemplate.slots.length}-photo arrangement styled for cohesive presentation.`}
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  <div style={{ background: "rgba(255,255,255,0.03)", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--border-subtle)" }}>
+                    <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Photo Slots</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{previewModalTemplate.slots.length} Photos</div>
+                  </div>
+                  <div style={{ background: "rgba(255,255,255,0.03)", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--border-subtle)" }}>
+                    <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Aspect Ratio</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>4:5 Vertical</div>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.35 }}>
+                  Tip: You can replace Slide {activeSlideIndex + 1}'s layout or add this as a new slide in your carousel without affecting existing slides.
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8, paddingTop: 14, borderTop: "1px solid var(--border-subtle)" }}>
+              <button
+                className="btn-secondary"
+                onClick={() => setPreviewModalTemplate(null)}
+                style={{ padding: "8px 16px" }}
+              >
+                Close Preview
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  handleInitiateApplyTemplate(previewModalTemplate);
+                }}
+                style={{ padding: "8px 18px", background: "#10b981", borderColor: "#10b981" }}
+              >
+                <Sparkles size={14} /> Apply Template…
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Phase 2: Safe Template Application Confirmation Modal ──────── */}
+      {confirmApplyModalTemplate && (
+        <div
+          className="modal-overlay"
+          onClick={() => setConfirmApplyModalTemplate(null)}
+          style={{ zIndex: 135 }}
+        >
+          <div
+            className="modal-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: 480,
+              width: "90%",
+              padding: 24,
+              background: "rgba(12, 14, 24, 0.98)",
+              border: "1px solid rgba(139, 92, 246, 0.35)",
+              boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(139, 92, 246, 0.15)",
+              borderRadius: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(139, 92, 246, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-violet-mid)" }}>
+                  <Sparkles size={18} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}>
+                    Apply "{confirmApplyModalTemplate.name}"
+                  </h3>
+                  <p style={{ fontSize: 11.5, color: "var(--text-muted)", margin: "2px 0 0" }}>
+                    Choose how you'd like to apply this recommended layout
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setConfirmApplyModalTemplate(null)}
+                style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 6 }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+              {/* Choice A: Replace Current Slide */}
+              <div
+                className="add-slide-choice-card"
+                onClick={() => handleApplyTemplate(confirmApplyModalTemplate, "replace")}
+                style={{
+                  padding: "16px 16px",
+                  borderRadius: 12,
+                  background: "rgba(255, 255, 255, 0.03)",
+                  border: "1px solid var(--border-subtle)",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  transition: "all 0.18s ease",
+                }}
+              >
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(16, 185, 129, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", flexShrink: 0 }}>
+                  <Check size={18} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>
+                    Replace Slide {activeSlideIndex + 1} Layout
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>
+                    Preserves your current photos and text layers into the new template slots.
+                  </div>
+                </div>
+              </div>
+
+              {/* Choice B: Add as New Slide (Zero risk) */}
+              <div
+                className="add-slide-choice-card"
+                onClick={() => handleApplyTemplate(confirmApplyModalTemplate, "new_slide")}
+                style={{
+                  padding: "16px 16px",
+                  borderRadius: 12,
+                  background: "rgba(255, 255, 255, 0.03)",
+                  border: "1px solid var(--border-subtle)",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  transition: "all 0.18s ease",
+                }}
+              >
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(139, 92, 246, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-violet-mid)", flexShrink: 0 }}>
+                  <Plus size={18} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>
+                    Add as New Slide (Safe)
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>
+                    Keeps Slide {activeSlideIndex + 1} exactly as is and appends a new slide with this layout.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
+              <button
+                className="btn-secondary"
+                onClick={() => setConfirmApplyModalTemplate(null)}
+                style={{ padding: "6px 14px", fontSize: 11.5 }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
