@@ -15,7 +15,7 @@ import {
   CheckCircle2, Sliders, Image as ImageIcon, Copy, Check, Bot,
   GripVertical, ChevronUp, ChevronDown, Plus, Trash2, ChevronLeft,
   ChevronRight, Terminal, Type, Move, ZoomIn, ZoomOut, RotateCw,
-  Palette, Grid, Film, BookOpen, Camera, Scissors, Search,
+  Palette, Grid, Film, BookOpen, Camera, Search,
   SlidersHorizontal, X, ExternalLink, Home as HomeIcon, Layout,
   Folder, Settings, Wand2, Compass, Heart, Share2, Eye, EyeOff,
   Lock, Unlock, Maximize2, Minimize2, MousePointer, FlipHorizontal,
@@ -321,8 +321,7 @@ export default function Home() {
   const [draggingSticker, setDraggingSticker] = useState<{ stickerId: string; startX: number; startY: number; initialX: number; initialY: number } | null>(null);
 
   // AI Studio interactive review modal
-  const [activeAiModal, setActiveAiModal] = useState<"captions" | "layouts" | "enhance" | "bg" | "hashtags" | null>(null);
-  const [aiSuggestions, setAiSuggestions] = useState<any>(null);
+  const [activeAiModal, setActiveAiModal] = useState<"captions" | "layouts" | "enhance" | "hashtags" | null>(null);
 
   // Dedicated AI Captions state (Phase 1)
   const [generatedCaptions, setGeneratedCaptions] = useState<CaptionSuggestion[]>([]);
@@ -1651,7 +1650,7 @@ export default function Home() {
   };
 
   // AI Actions Trigger
-  const handleTriggerAiAction = async (action: "captions" | "layouts" | "enhance" | "bg" | "hashtags") => {
+  const handleTriggerAiAction = async (action: "captions" | "layouts" | "enhance" | "hashtags") => {
     setActiveAiModal(action);
 
     if (action === "captions") {
@@ -1679,28 +1678,6 @@ export default function Home() {
         handleGenerateHashtags(false);
       }
       return;
-    }
-
-    setAiSuggestions(null);
-    showToast(`AI Studio: Analyzing ${action}…`);
-
-    try {
-      const res = await fetch("http://localhost:8000/api/ai-action", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action,
-          preset_id: activePreset.layout_id,
-          photo_count: activePreset.slots.length,
-          title: projectTitle,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setAiSuggestions(data.result);
-      }
-    } catch {
-      // Background removal or general mock action
     }
   };
 
@@ -4033,16 +4010,6 @@ export default function Home() {
                                       ? `All ${activeSlide.photos.length} photos enhanced • Click to inspect`
                                       : `Auto improve lighting, contrast, and vivid colors for all ${activeSlide.photos.length} photos`}
                                   </div>
-                                </div>
-                              </div>
-
-                              <div className="ai-tool-card" onClick={() => handleTriggerAiAction("bg")}>
-                                <div className="ai-card-icon-box" style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#3b82f6" }}>
-                                  <Scissors size={16} />
-                                </div>
-                                <div className="ai-card-info">
-                                  <div className="ai-card-title">Remove Background</div>
-                                  <div className="ai-card-desc">Isolate subject and add backdrop color</div>
                                 </div>
                               </div>
 

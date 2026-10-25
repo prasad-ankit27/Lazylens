@@ -21,15 +21,44 @@ OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
 OLLAMA_VISION_MODEL = os.getenv("OLLAMA_VISION_MODEL", "llava")
 
 
-def encode_image_for_vision(image_path: str, max_dimension: int = 512) -> str:
-    """
-    Reads an image from disk, optimizes dimensions (512px max) for rapid CLIP/vision encoding,
-    and returns a base64-encoded UTF-8 string.
-    """
-    if not os.path.exists(image_path):
-        raise FileNotFoundError(f"Image not found at: {image_path}")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    with Image.open(image_path) as img:
+
+def encode_image_for_vision(image_input: str, max_dimension: int = 512) -> str:
+    """
+    Reads an image from disk path, public URL, or base64 data URI, optimizes dimensions
+    (512px max) for rapid vision encoding, and returns a base64-encoded UTF-8 string.
+    """
+    raw_bytes = None
+
+    if image_input.startswith("data:image"):
+        # Base64 data URI
+        base64_data = image_input.split(",", 1)[-1]
+        raw_bytes = base64.b64decode(base64_data)
+    elif image_input.startswith("http://") or image_input.startswith("https://"):
+        # Remote URL
+        resp = requests.get(image_input, timeout=15)
+        resp.raise_for_status()
+        raw_bytes = resp.content
+    else:
+        # Check disk path (absolute or relative)
+        resolved_path = image_input
+        if not os.path.exists(resolved_path):
+            # Check frontend public folder
+            clean_rel = image_input.lstrip("/\\")
+            cand1 = os.path.join(BASE_DIR, "frontend", "public", clean_rel)
+            cand2 = os.path.join(BASE_DIR, clean_rel)
+            if os.path.exists(cand1):
+                resolved_path = cand1
+            elif os.path.exists(cand2):
+                resolved_path = cand2
+            else:
+                raise FileNotFoundError(f"Image not found at: {image_input}")
+
+        with open(resolved_path, "rb") as f:
+            raw_bytes = f.read()
+
+    with Image.open(io.BytesIO(raw_bytes)) as img:
         # Convert RGBA/P to RGB for clean JPEG encoding
         if img.mode != "RGB":
             img = img.convert("RGB")
@@ -55,25 +84,53 @@ def analyze_scene_sync(
     """
     Synchronous scene analysis using Ollama's vision model via requests.
     """
+    return analyze_multiscene_sync([image_path], ollama_url=ollama_url, model=model, timeout=timeout)
+
+
+def analyze_multiscene_sync(
+    images: list[str],
+    ollama_url: Optional[str] = None,
+    model: Optional[str] = None,
+    timeout: int = 120,
+) -> str:
+    """
+    Synchronous multi-image scene analysis using Ollama's vision model (llava).
+    Analyzes all images belonging to the current slide/template together to describe
+    their combined scene, mood, subjects, lighting, and aesthetic.
+    """
     base_url = (ollama_url or OLLAMA_API_URL).rstrip("/")
     target_model = model or OLLAMA_VISION_MODEL
     endpoint = f"{base_url}/api/generate"
 
-    base64_image = encode_image_for_vision(image_path)
+    if not images:
+        raise ValueError("At least one image is required for scene analysis.")
+
+    # Encode up to 4 images for collective context
+    encoded_images = []
+    for img_input in images[:4]:
+        try:
+            b64_str = encode_image_for_vision(img_input)
+            encoded_images.append(b64_str)
+        except Exception as enc_err:
+            print(f"[Vision Warning] Could not encode image: {enc_err}")
+
+    if not encoded_images:
+        raise ValueError("None of the provided images could be loaded or encoded.")
 
     prompt = (
-        "Describe this photo in 1 to 2 concise, vivid sentences. "
-        "Highlight the primary subject, lighting, mood, aesthetic tones, and setting."
+        "You are an expert visual director. Describe the combined scene, subject matter, "
+        "lighting, mood, color palette, and collective aesthetic across these photos in 2-3 vivid sentences. "
+        "Focus on the actual setting, human presence, ambiance, and activity depicted."
     )
 
     payload = {
         "model": target_model,
         "prompt": prompt,
-        "images": [base64_image],
+        "images": encoded_images,
         "stream": False,
         "options": {
             "temperature": 0.2,
-            "num_predict": 64,
+            "num_predict": 90,
         },
     }
 
@@ -83,11 +140,14 @@ def analyze_scene_sync(
         data = response.json()
         summary = data.get("response", "").strip()
         if not summary:
-            return "A stylized visual composition captured with artistic lighting and balanced aesthetics."
+            raise RuntimeError("Empty response received from vision model.")
         return summary
-    except Exception as e:
-        print(f"[Vision Error] Failed to analyze scene with Ollama ({target_model}): {e}")
-        return "An aesthetically curated moment with thoughtful composition and warm ambient light."
+    except requests.exceptions.RequestException as e:
+        print(f"[Vision Error] Ollama service error ({target_model}): {e}")
+        raise ConnectionError(
+            f"Ollama vision service is unavailable at {base_url}. "
+            f"Ensure Ollama is running and model '{target_model}' is installed."
+        ) from e
 
 
 async def analyze_scene(
@@ -97,12 +157,29 @@ async def analyze_scene(
     timeout: int = 120,
 ) -> str:
     """
-    Asynchronous wrapper for analyze_scene_sync using asyncio.to_thread.
-    Ensures non-blocking execution while strictly using standard requests.
+    Asynchronous wrapper for single image scene analysis.
     """
     return await asyncio.to_thread(
         analyze_scene_sync,
         image_path=image_path,
+        ollama_url=ollama_url,
+        model=model,
+        timeout=timeout,
+    )
+
+
+async def analyze_multiscene(
+    images: list[str],
+    ollama_url: Optional[str] = None,
+    model: Optional[str] = None,
+    timeout: int = 120,
+) -> str:
+    """
+    Asynchronous wrapper for multi-image scene analysis.
+    """
+    return await asyncio.to_thread(
+        analyze_multiscene_sync,
+        images=images,
         ollama_url=ollama_url,
         model=model,
         timeout=timeout,
@@ -116,3 +193,4 @@ if __name__ == "__main__":
     result = analyze_scene_sync(test_img)
     print("\n--- Scene Summary ---")
     print(result)
+

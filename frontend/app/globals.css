@@ -1003,9 +1003,9 @@ body::before {
 .layer-icon-btn.active { color: var(--accent-violet-mid); }
 
 /* ── AI Action Cards (Tab 3) ────────────────────────────────────── */
-.ai-cards-stack { display: flex; flex-direction: column; gap: 8px; }
+.ai-cards-stack { display: flex; flex-direction: column; gap: 10px; }
 .ai-tool-card {
-  display: flex; align-items: center; gap: 12px; padding: 12px;
+  display: flex; align-items: center; gap: 13px; padding: 13px 14px;
   border-radius: var(--r-lg); background: rgba(255,255,255,0.025);
   border: 1px solid var(--border-faint); cursor: pointer;
   transition: all var(--dur-base) var(--ease-out); text-align: left;
@@ -1015,12 +1015,12 @@ body::before {
   transform: translateY(-1px); box-shadow: var(--shadow-sm);
 }
 .ai-card-icon-box {
-  width: 36px; height: 36px; border-radius: var(--r-md);
+  width: 38px; height: 38px; border-radius: var(--r-md);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .ai-card-info { flex: 1; min-width: 0; }
-.ai-card-title { font-size: 12px; font-weight: 700; color: var(--text-primary); }
-.ai-card-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+.ai-card-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
+.ai-card-desc { font-size: 10.5px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
 
 /* ── Upgraded Bottom Timeline & Carousel Settings ────────────────── */
 .bottom-timeline-strip {
