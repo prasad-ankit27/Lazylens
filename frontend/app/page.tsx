@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   PRESET_LAYOUTS,
   CATEGORIES_DATA,
@@ -23,7 +24,7 @@ import {
   Lock, Unlock, Maximize2, Minimize2, MousePointer, FlipHorizontal,
   FlipVertical, Crop, Magnet, MoreHorizontal, MoreVertical, Undo2,
   Redo2, Cloud, Sparkle, Smile, Sun, Ratio, CheckCheck, Square,
-  AlignLeft, AlignCenter, AlignRight, AlertCircle,
+  AlignLeft, AlignCenter, AlignRight, AlertCircle, LogOut,
 } from "lucide-react";
 
 interface CaptionSuggestion {
@@ -232,6 +233,46 @@ export default function Home() {
   const [history, setHistory] = useState<CarouselSlide[][]>([INITIAL_SLIDES]);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
   const [activeSlideIndex, setActiveSlideIndex] = useState<number>(0);
+
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<{ id: string; name: string; email: string; plan: string } | null>(null);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+  // Authenticate and load user profile & projects
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => {
+        if (!res.ok) {
+          router.push("/login");
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data?.authenticated && data?.user) {
+          setCurrentUser(data.user);
+        }
+      })
+      .catch(() => {});
+
+    // Fetch user's saved projects
+    fetch("/api/projects")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.projects && Array.isArray(data.projects) && data.projects.length > 0) {
+          setSavedProjects(data.projects);
+        }
+      })
+      .catch(() => {});
+  }, [router]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
+    router.push("/login");
+    router.refresh();
+  };
 
   // Template selection state: reflects current active template
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>("grid_2x2");
@@ -1804,16 +1845,46 @@ export default function Home() {
           })}
         </nav>
 
-        {/* Bottom User Profile (Storage Indicator removed as requested) */}
+        {/* Bottom User Profile */}
         <div className="sidebar-bottom-block">
-          <div className="user-profile-chip">
-            <div className="user-avatar">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Ankit Prasad" />
+          <div className="user-profile-chip-wrapper">
+            <div
+              className="user-profile-chip clickable"
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              title="Account & Profile Options"
+            >
+              <div className="user-avatar-initials">
+                {currentUser?.name
+                  ? currentUser.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()
+                      .slice(0, 2)
+                  : "LP"}
+              </div>
+              <div className="user-info">
+                <span className="user-name">{currentUser?.name || "Loading…"}</span>
+                <span className="user-plan">{currentUser?.plan || "Free Plan"}</span>
+              </div>
             </div>
-            <div className="user-info">
-              <span className="user-name">Ankit Prasad</span>
-              <span className="user-plan">Free Plan</span>
-            </div>
+
+            {/* Profile Dropdown Menu */}
+            {isProfileMenuOpen && (
+              <div className="user-profile-menu">
+                <div className="user-profile-menu-header">
+                  <div className="user-profile-menu-name">{currentUser?.name || "Creator"}</div>
+                  <div className="user-profile-menu-email">{currentUser?.email || ""}</div>
+                </div>
+                <button
+                  className="user-profile-menu-item user-profile-menu-logout"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={14} />
+                  <span>Log Out</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </aside>
