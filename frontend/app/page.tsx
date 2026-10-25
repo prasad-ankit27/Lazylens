@@ -9,6 +9,8 @@ import {
   SlotTransform,
   TextElement,
   StickerElement,
+  FONT_CATEGORIES,
+  getFontCssStack,
 } from "./presets";
 import {
   Layers, ArrowLeftRight, Download, Upload, RefreshCw, Sparkles,
@@ -263,6 +265,7 @@ export default function Home() {
   const [showGridGuides, setShowGridGuides] = useState<boolean>(true);
   const [isSnappingEnabled, setIsSnappingEnabled] = useState<boolean>(true);
   const [projectTitle, setProjectTitle] = useState<string>("Neon Moments Vol. 1");
+  const [selectedFontFamily, setSelectedFontFamily] = useState<string>("Playfair Display");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -810,10 +813,12 @@ export default function Home() {
 
   // Text element actions
   const handleAddTextElement = (preset?: Partial<TextElement>) => {
+    const chosenFont = preset?.font || (activeSelectedText?.font || selectedFontFamily || "Playfair Display");
     const newText: TextElement = {
       id: `text_${Date.now()}`,
-      text: preset?.text || "Adventure",
-      font: preset?.font || "Playfair Display",
+      text: preset?.text || "Heading",
+      font: chosenFont,
+      fontStyle: preset?.fontStyle || "normal",
       color: preset?.color || "#FFFFFF",
       size: preset?.size || 56,
       weight: preset?.weight || 700,
@@ -918,6 +923,13 @@ export default function Home() {
       }
     }
 
+    // Ensure document webfonts have loaded before rendering onto 2D canvas
+    try {
+      if (typeof document !== "undefined" && document.fonts) {
+        await document.fonts.ready;
+      }
+    } catch (e) {}
+
     // Text layers
     for (const te of slide.textElements || []) {
       if (te.hidden) continue;
@@ -925,7 +937,9 @@ export default function Home() {
       ctx.translate(te.x, te.y);
       if (te.rotation) ctx.rotate((te.rotation * Math.PI) / 180);
       ctx.fillStyle = te.color || "#FFFFFF";
-      ctx.font = `${te.weight || 700} ${te.size || 24}px "${te.font || "Plus Jakarta Sans"}", sans-serif`;
+      const fontStack = getFontCssStack(te.font);
+      const fontStyle = te.fontStyle || "normal";
+      ctx.font = `${fontStyle} ${te.weight || 700} ${te.size || 24}px ${fontStack}`;
       ctx.textAlign = (te.align as any) || "left";
       if (te.shadow) {
         ctx.shadowColor = "rgba(0,0,0,0.6)";
@@ -2069,7 +2083,7 @@ export default function Home() {
                           if (textElements.length > 0) {
                             setSelectedLayer({ type: "text", id: textElements[0].id });
                           } else {
-                            handleAddTextElement({ text: "Adventure" });
+                            handleAddTextElement({ text: "Heading" });
                           }
                         }
                       }}
@@ -2313,7 +2327,8 @@ export default function Home() {
                                   top: `${(te.y / 1350) * 100}%`,
                                   transform: `translate(-50%, -50%) rotate(${te.rotation || 0}deg)`,
                                   color: te.color,
-                                  fontFamily: `"${te.font}", sans-serif`,
+                                  fontFamily: getFontCssStack(te.font),
+                                  fontStyle: te.fontStyle || "normal",
                                   fontSize: `${(te.size / 1080) * 360}px`,
                                   fontWeight: te.weight,
                                   textAlign: te.align as any,
@@ -2638,16 +2653,42 @@ export default function Home() {
                                     value={activeSelectedText.font}
                                     onChange={(e) => {
                                       const val = e.target.value;
+                                      setSelectedFontFamily(val);
                                       updateActiveSlide((s) => ({
                                         ...s,
                                         textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, font: val } : t),
                                       }));
                                     }}
                                     className="ratio-select"
-                                    style={{ width: "100%", padding: "6px 8px", fontSize: 11.5 }}
+                                    style={{
+                                      width: "100%",
+                                      padding: "6px 8px",
+                                      fontSize: 11.5,
+                                      fontFamily: getFontCssStack(activeSelectedText.font),
+                                    }}
                                   >
-                                    {["Playfair Display", "Plus Jakarta Sans", "Caveat", "Outfit", "Inter", "Cinzel", "JetBrains Mono"].map((f) => (
-                                      <option key={f} value={f}>{f}</option>
+                                    {FONT_CATEGORIES.map((cat) => (
+                                      <optgroup
+                                        key={cat.category}
+                                        label={`── ${cat.category} ──`}
+                                        style={{ fontFamily: "var(--font-ui)", background: "#111520", color: "var(--text-muted)", fontSize: 10 }}
+                                      >
+                                        {cat.fonts.map((f) => (
+                                          <option
+                                            key={f.name}
+                                            value={f.name}
+                                            style={{
+                                              fontFamily: `"${f.family}", ${f.fallback}`,
+                                              fontSize: 12.5,
+                                              padding: "4px 8px",
+                                              background: "#161b22",
+                                              color: "#ffffff",
+                                            }}
+                                          >
+                                            {f.name}
+                                          </option>
+                                        ))}
+                                      </optgroup>
                                     ))}
                                   </select>
                                 </div>
@@ -2700,16 +2741,16 @@ export default function Home() {
 
                                 <button
                                   type="button"
-                                  className={`btn-ghost${activeSelectedText.font === "Caveat" ? " align-active" : ""}`}
+                                  className={`btn-ghost${activeSelectedText.fontStyle === "italic" ? " align-active" : ""}`}
                                   onClick={() => {
-                                    const nextFont = activeSelectedText.font === "Caveat" ? "Playfair Display" : "Caveat";
+                                    const nextStyle = activeSelectedText.fontStyle === "italic" ? "normal" : "italic";
                                     updateActiveSlide((s) => ({
                                       ...s,
-                                      textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, font: nextFont } : t),
+                                      textElements: (s.textElements || []).map((t) => t.id === activeSelectedText.id ? { ...t, fontStyle: nextStyle } : t),
                                     }));
                                   }}
                                   style={{ width: 28, height: 28, padding: 0, justifyContent: "center", fontStyle: "italic", fontSize: 12 }}
-                                  title="Script / Italic style"
+                                  title="Italic"
                                 >
                                   I
                                 </button>

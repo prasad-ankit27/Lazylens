@@ -1561,6 +1561,149 @@
           "EQUILIBRIUM",
           "Negative Space 2026"
         ]
+      },
+      {
+        "layout_id": "minimal_story_diptych",
+        "name": "Minimal Story Diptych",
+        "category": "Minimalist",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#0f121a",
+          "outer_margin": 64,
+          "gutter": 32
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 64,
+            "y": 80,
+            "width": 460,
+            "height": 680,
+            "fit_mode": "cover",
+            "border_radius": 10
+          },
+          {
+            "slot_index": 1,
+            "x": 556,
+            "y": 590,
+            "width": 460,
+            "height": 680,
+            "fit_mode": "cover",
+            "border_radius": 10
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "GOOD DAYS",
+          "Simple moments, big memories",
+          "Quiet morning reflections"
+        ]
+      },
+      {
+        "layout_id": "lifestyle_photo_dump_asym",
+        "name": "Lifestyle Photo Dump",
+        "category": "Minimalist",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#090b10",
+          "outer_margin": 48,
+          "gutter": 16
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 460,
+            "height": 680,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 1,
+            "x": 540,
+            "y": 48,
+            "width": 492,
+            "height": 440,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 2,
+            "x": 540,
+            "y": 520,
+            "width": 492,
+            "height": 782,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 3,
+            "x": 48,
+            "y": 760,
+            "width": 460,
+            "height": 542,
+            "fit_mode": "cover",
+            "border_radius": 8
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "WEEKEND DUMP",
+          "Candid snapshots & warm coffee",
+          "Life lately through 35mm"
+        ]
+      },
+      {
+        "layout_id": "minimal_negative_space",
+        "name": "Negative Space Minimal",
+        "category": "Minimalist",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#0d1017",
+          "outer_margin": 72,
+          "gutter": 24
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 360,
+            "y": 96,
+            "width": 648,
+            "height": 780,
+            "fit_mode": "cover",
+            "border_radius": 4
+          },
+          {
+            "slot_index": 1,
+            "x": 72,
+            "y": 750,
+            "width": 400,
+            "height": 504,
+            "fit_mode": "cover",
+            "border_radius": 4
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "STILLNESS",
+          "Artful negative space and calm textures",
+          "Form follows light"
+        ]
       }
     ],
     "Film": [
@@ -1657,8 +1800,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"in the quiet between city lights, we found our rhythm\" \u2014",
-            "timecode": "REC \u25cf [01:42:19]  \u2022  35MM KODAK 500T"
+            "subtitle": "— \"in the quiet between city lights, we found our rhythm\" —",
+            "timecode": "REC ● [01:42:19]  •  35MM KODAK 500T"
           }
         },
         "sample_images": [
@@ -1713,8 +1856,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"we wander across shadows where dreams stay awake\" \u2014",
-            "timecode": "REC \u25cf [00:14:32] \u2022 35MM KODAK 500T"
+            "subtitle": "— \"we wander across shadows where dreams stay awake\" —",
+            "timecode": "REC ● [00:14:32] • 35MM KODAK 500T"
           }
         },
         "sample_images": [
@@ -1770,8 +1913,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"in the quiet between city lights, we found our rhythm\" \u2014",
-            "timecode": "REC \u25cf [01:02:18] \u2022 FUJIFILM ETERNA 250D"
+            "subtitle": "— \"in the quiet between city lights, we found our rhythm\" —",
+            "timecode": "REC ● [01:02:18] • FUJIFILM ETERNA 250D"
           }
         },
         "sample_images": [
@@ -1781,7 +1924,7 @@
         ],
         "sample_text": [
           "ANALOG ARCHIVE",
-          "REC \u25cf [01:42:19] \u2022 24 FPS"
+          "REC ● [01:42:19] • 24 FPS"
         ]
       },
       {
@@ -1827,8 +1970,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"time slows down in neon reflections\" \u2014",
-            "timecode": "REC \u25cf [02:33:04] \u2022 ILFORD HP5 PLUS 400"
+            "subtitle": "— \"time slows down in neon reflections\" —",
+            "timecode": "REC ● [02:33:04] • ILFORD HP5 PLUS 400"
           }
         },
         "sample_images": [
@@ -1884,8 +2027,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"every frame holds a silent memory\" \u2014",
-            "timecode": "REC \u25cf [00:48:55] \u2022 CINESTILL 800T \u2022 24 FPS"
+            "subtitle": "— \"every frame holds a silent memory\" —",
+            "timecode": "REC ● [00:48:55] • CINESTILL 800T • 24 FPS"
           }
         },
         "sample_images": [
@@ -1941,8 +2084,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"the story continues after dark\" \u2014",
-            "timecode": "REC \u25cf [01:19:40] \u2022 KODAK PORTRA 400"
+            "subtitle": "— \"the story continues after dark\" —",
+            "timecode": "REC ● [01:19:40] • KODAK PORTRA 400"
           }
         },
         "sample_images": [
@@ -1998,8 +2141,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"analog heart in a digital world\" \u2014",
-            "timecode": "REC \u25cf [03:05:12] \u2022 70MM PANAVISION"
+            "subtitle": "— \"analog heart in a digital world\" —",
+            "timecode": "REC ● [03:05:12] • 70MM PANAVISION"
           }
         },
         "sample_images": [
@@ -2009,7 +2152,7 @@
         ],
         "sample_text": [
           "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
+          "CineStill 800T • Nightwalks"
         ]
       },
       {
@@ -2046,8 +2189,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"time slows down in neon reflections\" \u2014",
-            "timecode": "REC \u25cf [02:33:04] \u2022 ILFORD HP5 PLUS 400"
+            "subtitle": "— \"time slows down in neon reflections\" —",
+            "timecode": "REC ● [02:33:04] • ILFORD HP5 PLUS 400"
           }
         },
         "sample_images": [
@@ -2056,7 +2199,7 @@
         ],
         "sample_text": [
           "ANALOG ARCHIVE",
-          "REC \u25cf [01:42:19] \u2022 24 FPS"
+          "REC ● [01:42:19] • 24 FPS"
         ]
       },
       {
@@ -2093,8 +2236,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"every frame holds a silent memory\" \u2014",
-            "timecode": "REC \u25cf [00:48:55] \u2022 CINESTILL 800T \u2022 24 FPS"
+            "subtitle": "— \"every frame holds a silent memory\" —",
+            "timecode": "REC ● [00:48:55] • CINESTILL 800T • 24 FPS"
           }
         },
         "sample_images": [
@@ -2140,8 +2283,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"the story continues after dark\" \u2014",
-            "timecode": "REC \u25cf [01:19:40] \u2022 KODAK PORTRA 400"
+            "subtitle": "— \"the story continues after dark\" —",
+            "timecode": "REC ● [01:19:40] • KODAK PORTRA 400"
           }
         },
         "sample_images": [
@@ -2187,8 +2330,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"analog heart in a digital world\" \u2014",
-            "timecode": "REC \u25cf [03:05:12] \u2022 70MM PANAVISION"
+            "subtitle": "— \"analog heart in a digital world\" —",
+            "timecode": "REC ● [03:05:12] • 70MM PANAVISION"
           }
         },
         "sample_images": [
@@ -2234,8 +2377,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"we wander across shadows where dreams stay awake\" \u2014",
-            "timecode": "REC \u25cf [00:14:32] \u2022 35MM KODAK 500T"
+            "subtitle": "— \"we wander across shadows where dreams stay awake\" —",
+            "timecode": "REC ● [00:14:32] • 35MM KODAK 500T"
           }
         },
         "sample_images": [
@@ -2244,74 +2387,7 @@
         ],
         "sample_text": [
           "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
-        ]
-      },
-      {
-        "layout_id": "film_contact_sheet_v1",
-        "name": "Medium Format Contact Sheet 1",
-        "category": "Film",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0d0c0a",
-          "outer_margin": 20,
-          "gutter": 16
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 20,
-            "y": 20,
-            "width": 512,
-            "height": 647,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 1,
-            "x": 548,
-            "y": 20,
-            "width": 512,
-            "height": 647,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 2,
-            "x": 20,
-            "y": 683,
-            "width": 512,
-            "height": 647,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 3,
-            "x": 548,
-            "y": 683,
-            "width": 512,
-            "height": 647,
-            "fit_mode": "cover",
-            "border_radius": 2
-          }
-        ],
-        "overlay": {
-          "type": "cinematic_subtitles",
-          "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 01\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "PORTRA 400",
-          "Tokyo Nocturne Series"
+          "CineStill 800T • Nightwalks"
         ]
       },
       {
@@ -2366,8 +2442,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 02\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
+            "subtitle": "— \"KODAK PORTRA 400 • FRAME 02\" —",
+            "timecode": "EXPOSURE +0.5 EV • ISO 400"
           }
         },
         "sample_images": [
@@ -2379,73 +2455,6 @@
         "sample_text": [
           "CINEMA VERITE",
           "Golden Hour 70mm"
-        ]
-      },
-      {
-        "layout_id": "film_contact_sheet_v3",
-        "name": "Medium Format Contact Sheet 3",
-        "category": "Film",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0d0c0a",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 502,
-            "height": 637,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 1,
-            "x": 550,
-            "y": 28,
-            "width": 502,
-            "height": 637,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 2,
-            "x": 28,
-            "y": 685,
-            "width": 502,
-            "height": 637,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 3,
-            "x": 550,
-            "y": 685,
-            "width": 502,
-            "height": 637,
-            "fit_mode": "cover",
-            "border_radius": 2
-          }
-        ],
-        "overlay": {
-          "type": "cinematic_subtitles",
-          "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 03\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "GRAIN & SHADOW",
-          "Kodak Tri-X 400 Exp. 24"
         ]
       },
       {
@@ -2500,8 +2509,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 04\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
+            "subtitle": "— \"KODAK PORTRA 400 • FRAME 04\" —",
+            "timecode": "EXPOSURE +0.5 EV • ISO 400"
           }
         },
         "sample_images": [
@@ -2512,74 +2521,7 @@
         ],
         "sample_text": [
           "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
-        ]
-      },
-      {
-        "layout_id": "film_contact_sheet_v5",
-        "name": "Medium Format Contact Sheet 5",
-        "category": "Film",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0d0c0a",
-          "outer_margin": 36,
-          "gutter": 24
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 36,
-            "y": 36,
-            "width": 492,
-            "height": 627,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 1,
-            "x": 552,
-            "y": 36,
-            "width": 492,
-            "height": 627,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 2,
-            "x": 36,
-            "y": 687,
-            "width": 492,
-            "height": 627,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 3,
-            "x": 552,
-            "y": 687,
-            "width": 492,
-            "height": 627,
-            "fit_mode": "cover",
-            "border_radius": 2
-          }
-        ],
-        "overlay": {
-          "type": "cinematic_subtitles",
-          "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 05\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "DIRECTOR'S CUT",
-          "35MM KODAK 500T"
+          "CineStill 800T • Nightwalks"
         ]
       },
       {
@@ -2756,7 +2698,7 @@
         ],
         "sample_text": [
           "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
+          "CineStill 800T • Nightwalks"
         ]
       },
       {
@@ -2874,7 +2816,7 @@
         ],
         "sample_text": [
           "ANALOG ARCHIVE",
-          "REC \u25cf [01:42:19] \u2022 24 FPS"
+          "REC ● [01:42:19] • 24 FPS"
         ]
       },
       {
@@ -2911,8 +2853,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-            "timecode": "KODAK TRI-X 400 \u2022 B&W"
+            "subtitle": "— HASSELBLAD 500C/M • 80MM F/2.8 —",
+            "timecode": "KODAK TRI-X 400 • B&W"
           }
         },
         "sample_images": [
@@ -2922,53 +2864,6 @@
         "sample_text": [
           "GRAIN & SHADOW",
           "Kodak Tri-X 400 Exp. 24"
-        ]
-      },
-      {
-        "layout_id": "film_120_roll_duo_v2",
-        "name": "120 Medium Format Roll Duo 2",
-        "category": "Film",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0f0f11",
-          "outer_margin": 40,
-          "gutter": 24
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 40,
-            "y": 40,
-            "width": 488,
-            "height": 1270,
-            "fit_mode": "cover",
-            "border_radius": 6
-          },
-          {
-            "slot_index": 1,
-            "x": 552,
-            "y": 40,
-            "width": 488,
-            "height": 1270,
-            "fit_mode": "cover",
-            "border_radius": 6
-          }
-        ],
-        "overlay": {
-          "type": "cinematic_subtitles",
-          "config": {
-            "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-            "timecode": "KODAK TRI-X 400 \u2022 B&W"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
         ]
       },
       {
@@ -3005,8 +2900,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-            "timecode": "KODAK TRI-X 400 \u2022 B&W"
+            "subtitle": "— HASSELBLAD 500C/M • 80MM F/2.8 —",
+            "timecode": "KODAK TRI-X 400 • B&W"
           }
         },
         "sample_images": [
@@ -3052,8 +2947,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-            "timecode": "KODAK TRI-X 400 \u2022 B&W"
+            "subtitle": "— HASSELBLAD 500C/M • 80MM F/2.8 —",
+            "timecode": "KODAK TRI-X 400 • B&W"
           }
         },
         "sample_images": [
@@ -3062,7 +2957,7 @@
         ],
         "sample_text": [
           "ANALOG ARCHIVE",
-          "REC \u25cf [01:42:19] \u2022 24 FPS"
+          "REC ● [01:42:19] • 24 FPS"
         ]
       }
     ],
@@ -3111,7 +3006,7 @@
           "type": "location_pill",
           "config": {
             "location": "DOLOMITES, ITALY",
-            "coordinates": "46.4102\u00b0 N, 11.8440\u00b0 E"
+            "coordinates": "46.4102° N, 11.8440° E"
           }
         },
         "sample_images": [
@@ -3121,7 +3016,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -3411,7 +3306,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -3574,7 +3469,7 @@
           "type": "location_pill",
           "config": {
             "location": "DOLOMITES, ITALY",
-            "coordinates": "46.4102\u00b0 N, 11.8440\u00b0 E"
+            "coordinates": "46.4102° N, 11.8440° E"
           }
         },
         "sample_images": [
@@ -3584,7 +3479,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -3631,7 +3526,7 @@
           "type": "location_pill",
           "config": {
             "location": "KYOTO, JAPAN",
-            "coordinates": "35.0116\u00b0 N, 135.7681\u00b0 E"
+            "coordinates": "35.0116° N, 135.7681° E"
           }
         },
         "sample_images": [
@@ -3641,64 +3536,7 @@
         ],
         "sample_text": [
           "KYOTO, JAPAN",
-          "35.0116\u00b0 N, 135.7681\u00b0 E"
-        ]
-      },
-      {
-        "layout_id": "editorial_wanderlust_v3",
-        "name": "Wanderlust Pill SANTORINI",
-        "category": "Editorial",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0d0f12",
-          "outer_margin": 24,
-          "gutter": 18
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 24,
-            "y": 24,
-            "width": 507,
-            "height": 780,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 549,
-            "y": 24,
-            "width": 507,
-            "height": 780,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 24,
-            "y": 822,
-            "width": 1032,
-            "height": 504,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "overlay": {
-          "type": "location_pill",
-          "config": {
-            "location": "SANTORINI, GREECE",
-            "coordinates": "36.3932\u00b0 N, 25.4615\u00b0 E"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "SANTORINI, GREECE",
-          "36.3932\u00b0 N, 25.4615\u00b0 E"
+          "35.0116° N, 135.7681° E"
         ]
       },
       {
@@ -3745,7 +3583,7 @@
           "type": "location_pill",
           "config": {
             "location": "REYKJAVIK, ICELAND",
-            "coordinates": "64.1466\u00b0 N, 21.9426\u00b0 W"
+            "coordinates": "64.1466° N, 21.9426° W"
           }
         },
         "sample_images": [
@@ -3755,7 +3593,7 @@
         ],
         "sample_text": [
           "REYKJAVIK, ICELAND",
-          "64.1466\u00b0 N, 21.9426\u00b0 W"
+          "64.1466° N, 21.9426° W"
         ]
       },
       {
@@ -3802,7 +3640,7 @@
           "type": "location_pill",
           "config": {
             "location": "AMALFI COAST, ITALY",
-            "coordinates": "40.6340\u00b0 N, 14.6027\u00b0 E"
+            "coordinates": "40.6340° N, 14.6027° E"
           }
         },
         "sample_images": [
@@ -3812,7 +3650,7 @@
         ],
         "sample_text": [
           "AMALFI COAST, ITALY",
-          "40.6340\u00b0 N, 14.6027\u00b0 E"
+          "40.6340° N, 14.6027° E"
         ]
       },
       {
@@ -3859,7 +3697,7 @@
           "type": "location_pill",
           "config": {
             "location": "ZERMATT, SWITZERLAND",
-            "coordinates": "45.9765\u00b0 N, 7.7491\u00b0 E"
+            "coordinates": "45.9765° N, 7.7491° E"
           }
         },
         "sample_images": [
@@ -3869,7 +3707,7 @@
         ],
         "sample_text": [
           "ZERMATT, SWITZERLAND",
-          "45.9765\u00b0 N, 7.7491\u00b0 E"
+          "45.9765° N, 7.7491° E"
         ]
       },
       {
@@ -4043,7 +3881,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -4259,7 +4097,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -4360,6 +4198,271 @@
         "sample_text": [
           "TRAVEL JOURNAL",
           "Kyoto In Autumn"
+        ]
+      },
+      {
+        "layout_id": "magazine_cover_hero",
+        "name": "Magazine Cover Story",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#0d1018",
+          "outer_margin": 48,
+          "gutter": 20
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 984,
+            "height": 860,
+            "fit_mode": "cover",
+            "border_radius": 12
+          },
+          {
+            "slot_index": 1,
+            "x": 48,
+            "y": 928,
+            "width": 482,
+            "height": 374,
+            "fit_mode": "cover",
+            "border_radius": 10
+          },
+          {
+            "slot_index": 2,
+            "x": 550,
+            "y": 928,
+            "width": 482,
+            "height": 374,
+            "fit_mode": "cover",
+            "border_radius": 10
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "JOURNEY: A COLLECTION OF MEMORIES",
+          "Highland wanderlust collection",
+          "October 2026 Editorial Issue"
+        ]
+      },
+      {
+        "layout_id": "editorial_split_asym",
+        "name": "Editorial Split (1 Large + 3 Stacked)",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#080a0f",
+          "outer_margin": 48,
+          "gutter": 16
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 580,
+            "height": 1254,
+            "fit_mode": "cover",
+            "border_radius": 12
+          },
+          {
+            "slot_index": 1,
+            "x": 644,
+            "y": 48,
+            "width": 388,
+            "height": 407,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 2,
+            "x": 644,
+            "y": 471,
+            "width": 388,
+            "height": 408,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 3,
+            "x": 644,
+            "y": 895,
+            "width": 388,
+            "height": 407,
+            "fit_mode": "cover",
+            "border_radius": 8
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "STYLE STORIES",
+          "Autumn/Winter Lookbook Feature",
+          "Through my lens: Parisian architecture"
+        ]
+      },
+      {
+        "layout_id": "clean_editorial_quad",
+        "name": "Clean Editorial Quad",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#080a0f",
+          "outer_margin": 48,
+          "gutter": 20
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 482,
+            "height": 617,
+            "fit_mode": "cover",
+            "border_radius": 6
+          },
+          {
+            "slot_index": 1,
+            "x": 550,
+            "y": 48,
+            "width": 482,
+            "height": 617,
+            "fit_mode": "cover",
+            "border_radius": 6
+          },
+          {
+            "slot_index": 2,
+            "x": 48,
+            "y": 685,
+            "width": 482,
+            "height": 617,
+            "fit_mode": "cover",
+            "border_radius": 6
+          },
+          {
+            "slot_index": 3,
+            "x": 550,
+            "y": 685,
+            "width": 482,
+            "height": 617,
+            "fit_mode": "cover",
+            "border_radius": 6
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "EDITORIAL GALLERY",
+          "Curated visual composition",
+          "Modern aesthetic 4:5 portfolio"
+        ]
+      },
+      {
+        "layout_id": "fashion_editorial_triptych",
+        "name": "Fashion Editorial Triptych",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#080a0f",
+          "outer_margin": 48,
+          "gutter": 20
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 560,
+            "height": 1254,
+            "fit_mode": "cover",
+            "border_radius": 12
+          },
+          {
+            "slot_index": 1,
+            "x": 640,
+            "y": 48,
+            "width": 392,
+            "height": 606,
+            "fit_mode": "cover",
+            "border_radius": 10
+          },
+          {
+            "slot_index": 2,
+            "x": 640,
+            "y": 696,
+            "width": 392,
+            "height": 606,
+            "fit_mode": "cover",
+            "border_radius": 10
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "RUNWAY ATELIER",
+          "Silhouette & drapery study",
+          "Milan Fashion Week Preview"
+        ]
+      },
+      {
+        "layout_id": "portrait_before_after_split",
+        "name": "Before & After Portrait Split",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#07090e",
+          "outer_margin": 48,
+          "gutter": 16
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 476,
+            "height": 1254,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 1,
+            "x": 556,
+            "y": 48,
+            "width": 476,
+            "height": 1254,
+            "fit_mode": "cover",
+            "border_radius": 8
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "BEFORE & AFTER",
+          "Color grade & retouching comparison",
+          "Dual 50/50 vertical split"
         ]
       }
     ],
@@ -5295,206 +5398,6 @@
         ]
       },
       {
-        "layout_id": "scrapbook_diagonal_step_v2",
-        "name": "Staggered Travel Stair Collage 2",
-        "category": "Scrapbook",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#161514",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 412,
-            "y": 448,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 78,
-            "y": 868,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "WEEKEND ESCAPE",
-          "Coffee & Polaroids"
-        ]
-      },
-      {
-        "layout_id": "scrapbook_diagonal_step_v3",
-        "name": "Staggered Travel Stair Collage 3",
-        "category": "Scrapbook",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#161514",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 412,
-            "y": 448,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 78,
-            "y": 868,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "JOURNAL NOTES",
-          "Pages from July"
-        ]
-      },
-      {
-        "layout_id": "scrapbook_diagonal_step_v4",
-        "name": "Staggered Travel Stair Collage 4",
-        "category": "Scrapbook",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#161514",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 412,
-            "y": 448,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 78,
-            "y": 868,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "SCRAPBOOK VIBES",
-          "Fleeting & Cherished"
-        ]
-      },
-      {
-        "layout_id": "scrapbook_diagonal_step_v5",
-        "name": "Staggered Travel Stair Collage 5",
-        "category": "Scrapbook",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#161514",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 412,
-            "y": 448,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 78,
-            "y": 868,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "SUMMER MEMORIES",
-          "Collected Moments 2026"
-        ]
-      },
-      {
         "layout_id": "scrapbook_postcard_duo_v1",
         "name": "Postcard Artisan Duo 1",
         "category": "Scrapbook",
@@ -6184,56 +6087,6 @@
         "sample_text": [
           "SUNLIT FRAMES",
           "Warm Breeze & Smiles"
-        ]
-      },
-      {
-        "layout_id": "polaroid_tri_snap_v2",
-        "name": "3-Snap Polaroid Strip 2",
-        "category": "Polaroid",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#09090b",
-          "outer_margin": 40,
-          "gutter": 24
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 40,
-            "y": 40,
-            "width": 1000,
-            "height": 407,
-            "fit_mode": "cover",
-            "border_radius": 4
-          },
-          {
-            "slot_index": 1,
-            "x": 40,
-            "y": 471,
-            "width": 1000,
-            "height": 407,
-            "fit_mode": "cover",
-            "border_radius": 4
-          },
-          {
-            "slot_index": 2,
-            "x": 40,
-            "y": 902,
-            "width": 1000,
-            "height": 407,
-            "fit_mode": "cover",
-            "border_radius": 4
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "STUDIO POLAROID",
-          "One of One Unique Print"
         ]
       },
       {
@@ -8349,6 +8202,149 @@
           "EQUILIBRIUM",
           "Negative Space 2026"
         ]
+      },
+      {
+        "layout_id": "minimal_story_diptych",
+        "name": "Minimal Story Diptych",
+        "category": "Minimalist",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#0f121a",
+          "outer_margin": 64,
+          "gutter": 32
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 64,
+            "y": 80,
+            "width": 460,
+            "height": 680,
+            "fit_mode": "cover",
+            "border_radius": 10
+          },
+          {
+            "slot_index": 1,
+            "x": 556,
+            "y": 590,
+            "width": 460,
+            "height": 680,
+            "fit_mode": "cover",
+            "border_radius": 10
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "GOOD DAYS",
+          "Simple moments, big memories",
+          "Quiet morning reflections"
+        ]
+      },
+      {
+        "layout_id": "lifestyle_photo_dump_asym",
+        "name": "Lifestyle Photo Dump",
+        "category": "Minimalist",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#090b10",
+          "outer_margin": 48,
+          "gutter": 16
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 460,
+            "height": 680,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 1,
+            "x": 540,
+            "y": 48,
+            "width": 492,
+            "height": 440,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 2,
+            "x": 540,
+            "y": 520,
+            "width": 492,
+            "height": 782,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 3,
+            "x": 48,
+            "y": 760,
+            "width": 460,
+            "height": 542,
+            "fit_mode": "cover",
+            "border_radius": 8
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "WEEKEND DUMP",
+          "Candid snapshots & warm coffee",
+          "Life lately through 35mm"
+        ]
+      },
+      {
+        "layout_id": "minimal_negative_space",
+        "name": "Negative Space Minimal",
+        "category": "Minimalist",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#0d1017",
+          "outer_margin": 72,
+          "gutter": 24
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 360,
+            "y": 96,
+            "width": 648,
+            "height": 780,
+            "fit_mode": "cover",
+            "border_radius": 4
+          },
+          {
+            "slot_index": 1,
+            "x": 72,
+            "y": 750,
+            "width": 400,
+            "height": 504,
+            "fit_mode": "cover",
+            "border_radius": 4
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "STILLNESS",
+          "Artful negative space and calm textures",
+          "Form follows light"
+        ]
       }
     ],
     "Film": [
@@ -8445,8 +8441,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"in the quiet between city lights, we found our rhythm\" \u2014",
-            "timecode": "REC \u25cf [01:42:19]  \u2022  35MM KODAK 500T"
+            "subtitle": "— \"in the quiet between city lights, we found our rhythm\" —",
+            "timecode": "REC ● [01:42:19]  •  35MM KODAK 500T"
           }
         },
         "sample_images": [
@@ -8501,8 +8497,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"we wander across shadows where dreams stay awake\" \u2014",
-            "timecode": "REC \u25cf [00:14:32] \u2022 35MM KODAK 500T"
+            "subtitle": "— \"we wander across shadows where dreams stay awake\" —",
+            "timecode": "REC ● [00:14:32] • 35MM KODAK 500T"
           }
         },
         "sample_images": [
@@ -8558,8 +8554,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"in the quiet between city lights, we found our rhythm\" \u2014",
-            "timecode": "REC \u25cf [01:02:18] \u2022 FUJIFILM ETERNA 250D"
+            "subtitle": "— \"in the quiet between city lights, we found our rhythm\" —",
+            "timecode": "REC ● [01:02:18] • FUJIFILM ETERNA 250D"
           }
         },
         "sample_images": [
@@ -8569,7 +8565,7 @@
         ],
         "sample_text": [
           "ANALOG ARCHIVE",
-          "REC \u25cf [01:42:19] \u2022 24 FPS"
+          "REC ● [01:42:19] • 24 FPS"
         ]
       },
       {
@@ -8615,8 +8611,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"time slows down in neon reflections\" \u2014",
-            "timecode": "REC \u25cf [02:33:04] \u2022 ILFORD HP5 PLUS 400"
+            "subtitle": "— \"time slows down in neon reflections\" —",
+            "timecode": "REC ● [02:33:04] • ILFORD HP5 PLUS 400"
           }
         },
         "sample_images": [
@@ -8672,8 +8668,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"every frame holds a silent memory\" \u2014",
-            "timecode": "REC \u25cf [00:48:55] \u2022 CINESTILL 800T \u2022 24 FPS"
+            "subtitle": "— \"every frame holds a silent memory\" —",
+            "timecode": "REC ● [00:48:55] • CINESTILL 800T • 24 FPS"
           }
         },
         "sample_images": [
@@ -8729,8 +8725,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"the story continues after dark\" \u2014",
-            "timecode": "REC \u25cf [01:19:40] \u2022 KODAK PORTRA 400"
+            "subtitle": "— \"the story continues after dark\" —",
+            "timecode": "REC ● [01:19:40] • KODAK PORTRA 400"
           }
         },
         "sample_images": [
@@ -8786,8 +8782,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"analog heart in a digital world\" \u2014",
-            "timecode": "REC \u25cf [03:05:12] \u2022 70MM PANAVISION"
+            "subtitle": "— \"analog heart in a digital world\" —",
+            "timecode": "REC ● [03:05:12] • 70MM PANAVISION"
           }
         },
         "sample_images": [
@@ -8797,7 +8793,7 @@
         ],
         "sample_text": [
           "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
+          "CineStill 800T • Nightwalks"
         ]
       },
       {
@@ -8834,8 +8830,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"time slows down in neon reflections\" \u2014",
-            "timecode": "REC \u25cf [02:33:04] \u2022 ILFORD HP5 PLUS 400"
+            "subtitle": "— \"time slows down in neon reflections\" —",
+            "timecode": "REC ● [02:33:04] • ILFORD HP5 PLUS 400"
           }
         },
         "sample_images": [
@@ -8844,7 +8840,7 @@
         ],
         "sample_text": [
           "ANALOG ARCHIVE",
-          "REC \u25cf [01:42:19] \u2022 24 FPS"
+          "REC ● [01:42:19] • 24 FPS"
         ]
       },
       {
@@ -8881,8 +8877,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"every frame holds a silent memory\" \u2014",
-            "timecode": "REC \u25cf [00:48:55] \u2022 CINESTILL 800T \u2022 24 FPS"
+            "subtitle": "— \"every frame holds a silent memory\" —",
+            "timecode": "REC ● [00:48:55] • CINESTILL 800T • 24 FPS"
           }
         },
         "sample_images": [
@@ -8928,8 +8924,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"the story continues after dark\" \u2014",
-            "timecode": "REC \u25cf [01:19:40] \u2022 KODAK PORTRA 400"
+            "subtitle": "— \"the story continues after dark\" —",
+            "timecode": "REC ● [01:19:40] • KODAK PORTRA 400"
           }
         },
         "sample_images": [
@@ -8975,8 +8971,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"analog heart in a digital world\" \u2014",
-            "timecode": "REC \u25cf [03:05:12] \u2022 70MM PANAVISION"
+            "subtitle": "— \"analog heart in a digital world\" —",
+            "timecode": "REC ● [03:05:12] • 70MM PANAVISION"
           }
         },
         "sample_images": [
@@ -9022,8 +9018,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"we wander across shadows where dreams stay awake\" \u2014",
-            "timecode": "REC \u25cf [00:14:32] \u2022 35MM KODAK 500T"
+            "subtitle": "— \"we wander across shadows where dreams stay awake\" —",
+            "timecode": "REC ● [00:14:32] • 35MM KODAK 500T"
           }
         },
         "sample_images": [
@@ -9032,74 +9028,7 @@
         ],
         "sample_text": [
           "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
-        ]
-      },
-      {
-        "layout_id": "film_contact_sheet_v1",
-        "name": "Medium Format Contact Sheet 1",
-        "category": "Film",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0d0c0a",
-          "outer_margin": 20,
-          "gutter": 16
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 20,
-            "y": 20,
-            "width": 512,
-            "height": 647,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 1,
-            "x": 548,
-            "y": 20,
-            "width": 512,
-            "height": 647,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 2,
-            "x": 20,
-            "y": 683,
-            "width": 512,
-            "height": 647,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 3,
-            "x": 548,
-            "y": 683,
-            "width": 512,
-            "height": 647,
-            "fit_mode": "cover",
-            "border_radius": 2
-          }
-        ],
-        "overlay": {
-          "type": "cinematic_subtitles",
-          "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 01\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "PORTRA 400",
-          "Tokyo Nocturne Series"
+          "CineStill 800T • Nightwalks"
         ]
       },
       {
@@ -9154,8 +9083,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 02\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
+            "subtitle": "— \"KODAK PORTRA 400 • FRAME 02\" —",
+            "timecode": "EXPOSURE +0.5 EV • ISO 400"
           }
         },
         "sample_images": [
@@ -9167,73 +9096,6 @@
         "sample_text": [
           "CINEMA VERITE",
           "Golden Hour 70mm"
-        ]
-      },
-      {
-        "layout_id": "film_contact_sheet_v3",
-        "name": "Medium Format Contact Sheet 3",
-        "category": "Film",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0d0c0a",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 502,
-            "height": 637,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 1,
-            "x": 550,
-            "y": 28,
-            "width": 502,
-            "height": 637,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 2,
-            "x": 28,
-            "y": 685,
-            "width": 502,
-            "height": 637,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 3,
-            "x": 550,
-            "y": 685,
-            "width": 502,
-            "height": 637,
-            "fit_mode": "cover",
-            "border_radius": 2
-          }
-        ],
-        "overlay": {
-          "type": "cinematic_subtitles",
-          "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 03\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "GRAIN & SHADOW",
-          "Kodak Tri-X 400 Exp. 24"
         ]
       },
       {
@@ -9288,8 +9150,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 04\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
+            "subtitle": "— \"KODAK PORTRA 400 • FRAME 04\" —",
+            "timecode": "EXPOSURE +0.5 EV • ISO 400"
           }
         },
         "sample_images": [
@@ -9300,74 +9162,7 @@
         ],
         "sample_text": [
           "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
-        ]
-      },
-      {
-        "layout_id": "film_contact_sheet_v5",
-        "name": "Medium Format Contact Sheet 5",
-        "category": "Film",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0d0c0a",
-          "outer_margin": 36,
-          "gutter": 24
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 36,
-            "y": 36,
-            "width": 492,
-            "height": 627,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 1,
-            "x": 552,
-            "y": 36,
-            "width": 492,
-            "height": 627,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 2,
-            "x": 36,
-            "y": 687,
-            "width": 492,
-            "height": 627,
-            "fit_mode": "cover",
-            "border_radius": 2
-          },
-          {
-            "slot_index": 3,
-            "x": 552,
-            "y": 687,
-            "width": 492,
-            "height": 627,
-            "fit_mode": "cover",
-            "border_radius": 2
-          }
-        ],
-        "overlay": {
-          "type": "cinematic_subtitles",
-          "config": {
-            "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 05\" \u2014",
-            "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "DIRECTOR'S CUT",
-          "35MM KODAK 500T"
+          "CineStill 800T • Nightwalks"
         ]
       },
       {
@@ -9544,7 +9339,7 @@
         ],
         "sample_text": [
           "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
+          "CineStill 800T • Nightwalks"
         ]
       },
       {
@@ -9662,7 +9457,7 @@
         ],
         "sample_text": [
           "ANALOG ARCHIVE",
-          "REC \u25cf [01:42:19] \u2022 24 FPS"
+          "REC ● [01:42:19] • 24 FPS"
         ]
       },
       {
@@ -9699,8 +9494,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-            "timecode": "KODAK TRI-X 400 \u2022 B&W"
+            "subtitle": "— HASSELBLAD 500C/M • 80MM F/2.8 —",
+            "timecode": "KODAK TRI-X 400 • B&W"
           }
         },
         "sample_images": [
@@ -9710,53 +9505,6 @@
         "sample_text": [
           "GRAIN & SHADOW",
           "Kodak Tri-X 400 Exp. 24"
-        ]
-      },
-      {
-        "layout_id": "film_120_roll_duo_v2",
-        "name": "120 Medium Format Roll Duo 2",
-        "category": "Film",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0f0f11",
-          "outer_margin": 40,
-          "gutter": 24
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 40,
-            "y": 40,
-            "width": 488,
-            "height": 1270,
-            "fit_mode": "cover",
-            "border_radius": 6
-          },
-          {
-            "slot_index": 1,
-            "x": 552,
-            "y": 40,
-            "width": 488,
-            "height": 1270,
-            "fit_mode": "cover",
-            "border_radius": 6
-          }
-        ],
-        "overlay": {
-          "type": "cinematic_subtitles",
-          "config": {
-            "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-            "timecode": "KODAK TRI-X 400 \u2022 B&W"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "VINTAGE ROLL",
-          "CineStill 800T \u2022 Nightwalks"
         ]
       },
       {
@@ -9793,8 +9541,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-            "timecode": "KODAK TRI-X 400 \u2022 B&W"
+            "subtitle": "— HASSELBLAD 500C/M • 80MM F/2.8 —",
+            "timecode": "KODAK TRI-X 400 • B&W"
           }
         },
         "sample_images": [
@@ -9840,8 +9588,8 @@
         "overlay": {
           "type": "cinematic_subtitles",
           "config": {
-            "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-            "timecode": "KODAK TRI-X 400 \u2022 B&W"
+            "subtitle": "— HASSELBLAD 500C/M • 80MM F/2.8 —",
+            "timecode": "KODAK TRI-X 400 • B&W"
           }
         },
         "sample_images": [
@@ -9850,7 +9598,7 @@
         ],
         "sample_text": [
           "ANALOG ARCHIVE",
-          "REC \u25cf [01:42:19] \u2022 24 FPS"
+          "REC ● [01:42:19] • 24 FPS"
         ]
       }
     ],
@@ -9966,7 +9714,7 @@
           "type": "location_pill",
           "config": {
             "location": "DOLOMITES, ITALY",
-            "coordinates": "46.4102\u00b0 N, 11.8440\u00b0 E"
+            "coordinates": "46.4102° N, 11.8440° E"
           }
         },
         "sample_images": [
@@ -9976,7 +9724,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -10266,7 +10014,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -10429,7 +10177,7 @@
           "type": "location_pill",
           "config": {
             "location": "DOLOMITES, ITALY",
-            "coordinates": "46.4102\u00b0 N, 11.8440\u00b0 E"
+            "coordinates": "46.4102° N, 11.8440° E"
           }
         },
         "sample_images": [
@@ -10439,7 +10187,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -10486,7 +10234,7 @@
           "type": "location_pill",
           "config": {
             "location": "KYOTO, JAPAN",
-            "coordinates": "35.0116\u00b0 N, 135.7681\u00b0 E"
+            "coordinates": "35.0116° N, 135.7681° E"
           }
         },
         "sample_images": [
@@ -10496,64 +10244,7 @@
         ],
         "sample_text": [
           "KYOTO, JAPAN",
-          "35.0116\u00b0 N, 135.7681\u00b0 E"
-        ]
-      },
-      {
-        "layout_id": "editorial_wanderlust_v3",
-        "name": "Wanderlust Pill SANTORINI",
-        "category": "Editorial",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#0d0f12",
-          "outer_margin": 24,
-          "gutter": 18
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 24,
-            "y": 24,
-            "width": 507,
-            "height": 780,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 549,
-            "y": 24,
-            "width": 507,
-            "height": 780,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 24,
-            "y": 822,
-            "width": 1032,
-            "height": 504,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "overlay": {
-          "type": "location_pill",
-          "config": {
-            "location": "SANTORINI, GREECE",
-            "coordinates": "36.3932\u00b0 N, 25.4615\u00b0 E"
-          }
-        },
-        "sample_images": [
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "SANTORINI, GREECE",
-          "36.3932\u00b0 N, 25.4615\u00b0 E"
+          "35.0116° N, 135.7681° E"
         ]
       },
       {
@@ -10600,7 +10291,7 @@
           "type": "location_pill",
           "config": {
             "location": "REYKJAVIK, ICELAND",
-            "coordinates": "64.1466\u00b0 N, 21.9426\u00b0 W"
+            "coordinates": "64.1466° N, 21.9426° W"
           }
         },
         "sample_images": [
@@ -10610,7 +10301,7 @@
         ],
         "sample_text": [
           "REYKJAVIK, ICELAND",
-          "64.1466\u00b0 N, 21.9426\u00b0 W"
+          "64.1466° N, 21.9426° W"
         ]
       },
       {
@@ -10657,7 +10348,7 @@
           "type": "location_pill",
           "config": {
             "location": "AMALFI COAST, ITALY",
-            "coordinates": "40.6340\u00b0 N, 14.6027\u00b0 E"
+            "coordinates": "40.6340° N, 14.6027° E"
           }
         },
         "sample_images": [
@@ -10667,7 +10358,7 @@
         ],
         "sample_text": [
           "AMALFI COAST, ITALY",
-          "40.6340\u00b0 N, 14.6027\u00b0 E"
+          "40.6340° N, 14.6027° E"
         ]
       },
       {
@@ -10714,7 +10405,7 @@
           "type": "location_pill",
           "config": {
             "location": "ZERMATT, SWITZERLAND",
-            "coordinates": "45.9765\u00b0 N, 7.7491\u00b0 E"
+            "coordinates": "45.9765° N, 7.7491° E"
           }
         },
         "sample_images": [
@@ -10724,7 +10415,7 @@
         ],
         "sample_text": [
           "ZERMATT, SWITZERLAND",
-          "45.9765\u00b0 N, 7.7491\u00b0 E"
+          "45.9765° N, 7.7491° E"
         ]
       },
       {
@@ -10898,7 +10589,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -11382,7 +11073,7 @@
         ],
         "sample_text": [
           "DOLOMITES, ITALY",
-          "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "46.4102° N, 11.8440° E"
         ]
       },
       {
@@ -11483,6 +11174,271 @@
         "sample_text": [
           "TRAVEL JOURNAL",
           "Kyoto In Autumn"
+        ]
+      },
+      {
+        "layout_id": "magazine_cover_hero",
+        "name": "Magazine Cover Story",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#0d1018",
+          "outer_margin": 48,
+          "gutter": 20
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 984,
+            "height": 860,
+            "fit_mode": "cover",
+            "border_radius": 12
+          },
+          {
+            "slot_index": 1,
+            "x": 48,
+            "y": 928,
+            "width": 482,
+            "height": 374,
+            "fit_mode": "cover",
+            "border_radius": 10
+          },
+          {
+            "slot_index": 2,
+            "x": 550,
+            "y": 928,
+            "width": 482,
+            "height": 374,
+            "fit_mode": "cover",
+            "border_radius": 10
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "JOURNEY: A COLLECTION OF MEMORIES",
+          "Highland wanderlust collection",
+          "October 2026 Editorial Issue"
+        ]
+      },
+      {
+        "layout_id": "editorial_split_asym",
+        "name": "Editorial Split (1 Large + 3 Stacked)",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#080a0f",
+          "outer_margin": 48,
+          "gutter": 16
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 580,
+            "height": 1254,
+            "fit_mode": "cover",
+            "border_radius": 12
+          },
+          {
+            "slot_index": 1,
+            "x": 644,
+            "y": 48,
+            "width": 388,
+            "height": 407,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 2,
+            "x": 644,
+            "y": 471,
+            "width": 388,
+            "height": 408,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 3,
+            "x": 644,
+            "y": 895,
+            "width": 388,
+            "height": 407,
+            "fit_mode": "cover",
+            "border_radius": 8
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "STYLE STORIES",
+          "Autumn/Winter Lookbook Feature",
+          "Through my lens: Parisian architecture"
+        ]
+      },
+      {
+        "layout_id": "clean_editorial_quad",
+        "name": "Clean Editorial Quad",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#080a0f",
+          "outer_margin": 48,
+          "gutter": 20
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 482,
+            "height": 617,
+            "fit_mode": "cover",
+            "border_radius": 6
+          },
+          {
+            "slot_index": 1,
+            "x": 550,
+            "y": 48,
+            "width": 482,
+            "height": 617,
+            "fit_mode": "cover",
+            "border_radius": 6
+          },
+          {
+            "slot_index": 2,
+            "x": 48,
+            "y": 685,
+            "width": 482,
+            "height": 617,
+            "fit_mode": "cover",
+            "border_radius": 6
+          },
+          {
+            "slot_index": 3,
+            "x": 550,
+            "y": 685,
+            "width": 482,
+            "height": 617,
+            "fit_mode": "cover",
+            "border_radius": 6
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "EDITORIAL GALLERY",
+          "Curated visual composition",
+          "Modern aesthetic 4:5 portfolio"
+        ]
+      },
+      {
+        "layout_id": "fashion_editorial_triptych",
+        "name": "Fashion Editorial Triptych",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#080a0f",
+          "outer_margin": 48,
+          "gutter": 20
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 560,
+            "height": 1254,
+            "fit_mode": "cover",
+            "border_radius": 12
+          },
+          {
+            "slot_index": 1,
+            "x": 640,
+            "y": 48,
+            "width": 392,
+            "height": 606,
+            "fit_mode": "cover",
+            "border_radius": 10
+          },
+          {
+            "slot_index": 2,
+            "x": 640,
+            "y": 696,
+            "width": 392,
+            "height": 606,
+            "fit_mode": "cover",
+            "border_radius": 10
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "RUNWAY ATELIER",
+          "Silhouette & drapery study",
+          "Milan Fashion Week Preview"
+        ]
+      },
+      {
+        "layout_id": "portrait_before_after_split",
+        "name": "Before & After Portrait Split",
+        "category": "Editorial",
+        "canvas": {
+          "width": 1080,
+          "height": 1350,
+          "background_color": "#07090e",
+          "outer_margin": 48,
+          "gutter": 16
+        },
+        "slots": [
+          {
+            "slot_index": 0,
+            "x": 48,
+            "y": 48,
+            "width": 476,
+            "height": 1254,
+            "fit_mode": "cover",
+            "border_radius": 8
+          },
+          {
+            "slot_index": 1,
+            "x": 556,
+            "y": 48,
+            "width": 476,
+            "height": 1254,
+            "fit_mode": "cover",
+            "border_radius": 8
+          }
+        ],
+        "sample_images": [
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80"
+        ],
+        "sample_text": [
+          "BEFORE & AFTER",
+          "Color grade & retouching comparison",
+          "Dual 50/50 vertical split"
         ]
       }
     ],
@@ -12418,206 +12374,6 @@
         ]
       },
       {
-        "layout_id": "scrapbook_diagonal_step_v2",
-        "name": "Staggered Travel Stair Collage 2",
-        "category": "Scrapbook",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#161514",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 412,
-            "y": 448,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 78,
-            "y": 868,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "WEEKEND ESCAPE",
-          "Coffee & Polaroids"
-        ]
-      },
-      {
-        "layout_id": "scrapbook_diagonal_step_v3",
-        "name": "Staggered Travel Stair Collage 3",
-        "category": "Scrapbook",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#161514",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 412,
-            "y": 448,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 78,
-            "y": 868,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "JOURNAL NOTES",
-          "Pages from July"
-        ]
-      },
-      {
-        "layout_id": "scrapbook_diagonal_step_v4",
-        "name": "Staggered Travel Stair Collage 4",
-        "category": "Scrapbook",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#161514",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 412,
-            "y": 448,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 78,
-            "y": 868,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "SCRAPBOOK VIBES",
-          "Fleeting & Cherished"
-        ]
-      },
-      {
-        "layout_id": "scrapbook_diagonal_step_v5",
-        "name": "Staggered Travel Stair Collage 5",
-        "category": "Scrapbook",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#161514",
-          "outer_margin": 28,
-          "gutter": 20
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 28,
-            "y": 28,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 1,
-            "x": 412,
-            "y": 448,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          },
-          {
-            "slot_index": 2,
-            "x": 78,
-            "y": 868,
-            "width": 640,
-            "height": 390,
-            "fit_mode": "cover",
-            "border_radius": 16
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "SUMMER MEMORIES",
-          "Collected Moments 2026"
-        ]
-      },
-      {
         "layout_id": "scrapbook_postcard_duo_v1",
         "name": "Postcard Artisan Duo 1",
         "category": "Scrapbook",
@@ -13307,56 +13063,6 @@
         "sample_text": [
           "SUNLIT FRAMES",
           "Warm Breeze & Smiles"
-        ]
-      },
-      {
-        "layout_id": "polaroid_tri_snap_v2",
-        "name": "3-Snap Polaroid Strip 2",
-        "category": "Polaroid",
-        "canvas": {
-          "width": 1080,
-          "height": 1350,
-          "background_color": "#09090b",
-          "outer_margin": 40,
-          "gutter": 24
-        },
-        "slots": [
-          {
-            "slot_index": 0,
-            "x": 40,
-            "y": 40,
-            "width": 1000,
-            "height": 407,
-            "fit_mode": "cover",
-            "border_radius": 4
-          },
-          {
-            "slot_index": 1,
-            "x": 40,
-            "y": 471,
-            "width": 1000,
-            "height": 407,
-            "fit_mode": "cover",
-            "border_radius": 4
-          },
-          {
-            "slot_index": 2,
-            "x": 40,
-            "y": 902,
-            "width": 1000,
-            "height": 407,
-            "fit_mode": "cover",
-            "border_radius": 4
-          }
-        ],
-        "sample_images": [
-          "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80",
-          "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80"
-        ],
-        "sample_text": [
-          "STUDIO POLAROID",
-          "One of One Unique Print"
         ]
       },
       {
@@ -15565,8 +15271,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"in the quiet between city lights, we found our rhythm\" \u2014",
-          "timecode": "REC \u25cf [01:42:19]  \u2022  35MM KODAK 500T"
+          "subtitle": "— \"in the quiet between city lights, we found our rhythm\" —",
+          "timecode": "REC ● [01:42:19]  •  35MM KODAK 500T"
         }
       },
       "sample_images": [
@@ -15621,8 +15327,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"we wander across shadows where dreams stay awake\" \u2014",
-          "timecode": "REC \u25cf [00:14:32] \u2022 35MM KODAK 500T"
+          "subtitle": "— \"we wander across shadows where dreams stay awake\" —",
+          "timecode": "REC ● [00:14:32] • 35MM KODAK 500T"
         }
       },
       "sample_images": [
@@ -15678,8 +15384,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"in the quiet between city lights, we found our rhythm\" \u2014",
-          "timecode": "REC \u25cf [01:02:18] \u2022 FUJIFILM ETERNA 250D"
+          "subtitle": "— \"in the quiet between city lights, we found our rhythm\" —",
+          "timecode": "REC ● [01:02:18] • FUJIFILM ETERNA 250D"
         }
       },
       "sample_images": [
@@ -15689,7 +15395,7 @@
       ],
       "sample_text": [
         "ANALOG ARCHIVE",
-        "REC \u25cf [01:42:19] \u2022 24 FPS"
+        "REC ● [01:42:19] • 24 FPS"
       ]
     },
     {
@@ -15735,8 +15441,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"time slows down in neon reflections\" \u2014",
-          "timecode": "REC \u25cf [02:33:04] \u2022 ILFORD HP5 PLUS 400"
+          "subtitle": "— \"time slows down in neon reflections\" —",
+          "timecode": "REC ● [02:33:04] • ILFORD HP5 PLUS 400"
         }
       },
       "sample_images": [
@@ -15792,8 +15498,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"every frame holds a silent memory\" \u2014",
-          "timecode": "REC \u25cf [00:48:55] \u2022 CINESTILL 800T \u2022 24 FPS"
+          "subtitle": "— \"every frame holds a silent memory\" —",
+          "timecode": "REC ● [00:48:55] • CINESTILL 800T • 24 FPS"
         }
       },
       "sample_images": [
@@ -15849,8 +15555,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"the story continues after dark\" \u2014",
-          "timecode": "REC \u25cf [01:19:40] \u2022 KODAK PORTRA 400"
+          "subtitle": "— \"the story continues after dark\" —",
+          "timecode": "REC ● [01:19:40] • KODAK PORTRA 400"
         }
       },
       "sample_images": [
@@ -15906,8 +15612,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"analog heart in a digital world\" \u2014",
-          "timecode": "REC \u25cf [03:05:12] \u2022 70MM PANAVISION"
+          "subtitle": "— \"analog heart in a digital world\" —",
+          "timecode": "REC ● [03:05:12] • 70MM PANAVISION"
         }
       },
       "sample_images": [
@@ -15917,7 +15623,7 @@
       ],
       "sample_text": [
         "VINTAGE ROLL",
-        "CineStill 800T \u2022 Nightwalks"
+        "CineStill 800T • Nightwalks"
       ]
     },
     {
@@ -15954,8 +15660,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"time slows down in neon reflections\" \u2014",
-          "timecode": "REC \u25cf [02:33:04] \u2022 ILFORD HP5 PLUS 400"
+          "subtitle": "— \"time slows down in neon reflections\" —",
+          "timecode": "REC ● [02:33:04] • ILFORD HP5 PLUS 400"
         }
       },
       "sample_images": [
@@ -15964,7 +15670,7 @@
       ],
       "sample_text": [
         "ANALOG ARCHIVE",
-        "REC \u25cf [01:42:19] \u2022 24 FPS"
+        "REC ● [01:42:19] • 24 FPS"
       ]
     },
     {
@@ -16001,8 +15707,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"every frame holds a silent memory\" \u2014",
-          "timecode": "REC \u25cf [00:48:55] \u2022 CINESTILL 800T \u2022 24 FPS"
+          "subtitle": "— \"every frame holds a silent memory\" —",
+          "timecode": "REC ● [00:48:55] • CINESTILL 800T • 24 FPS"
         }
       },
       "sample_images": [
@@ -16048,8 +15754,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"the story continues after dark\" \u2014",
-          "timecode": "REC \u25cf [01:19:40] \u2022 KODAK PORTRA 400"
+          "subtitle": "— \"the story continues after dark\" —",
+          "timecode": "REC ● [01:19:40] • KODAK PORTRA 400"
         }
       },
       "sample_images": [
@@ -16095,8 +15801,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"analog heart in a digital world\" \u2014",
-          "timecode": "REC \u25cf [03:05:12] \u2022 70MM PANAVISION"
+          "subtitle": "— \"analog heart in a digital world\" —",
+          "timecode": "REC ● [03:05:12] • 70MM PANAVISION"
         }
       },
       "sample_images": [
@@ -16142,8 +15848,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"we wander across shadows where dreams stay awake\" \u2014",
-          "timecode": "REC \u25cf [00:14:32] \u2022 35MM KODAK 500T"
+          "subtitle": "— \"we wander across shadows where dreams stay awake\" —",
+          "timecode": "REC ● [00:14:32] • 35MM KODAK 500T"
         }
       },
       "sample_images": [
@@ -16152,74 +15858,7 @@
       ],
       "sample_text": [
         "VINTAGE ROLL",
-        "CineStill 800T \u2022 Nightwalks"
-      ]
-    },
-    {
-      "layout_id": "film_contact_sheet_v1",
-      "name": "Medium Format Contact Sheet 1",
-      "category": "Film",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#0d0c0a",
-        "outer_margin": 20,
-        "gutter": 16
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 20,
-          "y": 20,
-          "width": 512,
-          "height": 647,
-          "fit_mode": "cover",
-          "border_radius": 2
-        },
-        {
-          "slot_index": 1,
-          "x": 548,
-          "y": 20,
-          "width": 512,
-          "height": 647,
-          "fit_mode": "cover",
-          "border_radius": 2
-        },
-        {
-          "slot_index": 2,
-          "x": 20,
-          "y": 683,
-          "width": 512,
-          "height": 647,
-          "fit_mode": "cover",
-          "border_radius": 2
-        },
-        {
-          "slot_index": 3,
-          "x": 548,
-          "y": 683,
-          "width": 512,
-          "height": 647,
-          "fit_mode": "cover",
-          "border_radius": 2
-        }
-      ],
-      "overlay": {
-        "type": "cinematic_subtitles",
-        "config": {
-          "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 01\" \u2014",
-          "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
-        }
-      },
-      "sample_images": [
-        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "PORTRA 400",
-        "Tokyo Nocturne Series"
+        "CineStill 800T • Nightwalks"
       ]
     },
     {
@@ -16274,8 +15913,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 02\" \u2014",
-          "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
+          "subtitle": "— \"KODAK PORTRA 400 • FRAME 02\" —",
+          "timecode": "EXPOSURE +0.5 EV • ISO 400"
         }
       },
       "sample_images": [
@@ -16287,73 +15926,6 @@
       "sample_text": [
         "CINEMA VERITE",
         "Golden Hour 70mm"
-      ]
-    },
-    {
-      "layout_id": "film_contact_sheet_v3",
-      "name": "Medium Format Contact Sheet 3",
-      "category": "Film",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#0d0c0a",
-        "outer_margin": 28,
-        "gutter": 20
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 28,
-          "y": 28,
-          "width": 502,
-          "height": 637,
-          "fit_mode": "cover",
-          "border_radius": 2
-        },
-        {
-          "slot_index": 1,
-          "x": 550,
-          "y": 28,
-          "width": 502,
-          "height": 637,
-          "fit_mode": "cover",
-          "border_radius": 2
-        },
-        {
-          "slot_index": 2,
-          "x": 28,
-          "y": 685,
-          "width": 502,
-          "height": 637,
-          "fit_mode": "cover",
-          "border_radius": 2
-        },
-        {
-          "slot_index": 3,
-          "x": 550,
-          "y": 685,
-          "width": 502,
-          "height": 637,
-          "fit_mode": "cover",
-          "border_radius": 2
-        }
-      ],
-      "overlay": {
-        "type": "cinematic_subtitles",
-        "config": {
-          "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 03\" \u2014",
-          "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
-        }
-      },
-      "sample_images": [
-        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "GRAIN & SHADOW",
-        "Kodak Tri-X 400 Exp. 24"
       ]
     },
     {
@@ -16408,8 +15980,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 04\" \u2014",
-          "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
+          "subtitle": "— \"KODAK PORTRA 400 • FRAME 04\" —",
+          "timecode": "EXPOSURE +0.5 EV • ISO 400"
         }
       },
       "sample_images": [
@@ -16420,74 +15992,7 @@
       ],
       "sample_text": [
         "VINTAGE ROLL",
-        "CineStill 800T \u2022 Nightwalks"
-      ]
-    },
-    {
-      "layout_id": "film_contact_sheet_v5",
-      "name": "Medium Format Contact Sheet 5",
-      "category": "Film",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#0d0c0a",
-        "outer_margin": 36,
-        "gutter": 24
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 36,
-          "y": 36,
-          "width": 492,
-          "height": 627,
-          "fit_mode": "cover",
-          "border_radius": 2
-        },
-        {
-          "slot_index": 1,
-          "x": 552,
-          "y": 36,
-          "width": 492,
-          "height": 627,
-          "fit_mode": "cover",
-          "border_radius": 2
-        },
-        {
-          "slot_index": 2,
-          "x": 36,
-          "y": 687,
-          "width": 492,
-          "height": 627,
-          "fit_mode": "cover",
-          "border_radius": 2
-        },
-        {
-          "slot_index": 3,
-          "x": 552,
-          "y": 687,
-          "width": 492,
-          "height": 627,
-          "fit_mode": "cover",
-          "border_radius": 2
-        }
-      ],
-      "overlay": {
-        "type": "cinematic_subtitles",
-        "config": {
-          "subtitle": "\u2014 \"KODAK PORTRA 400 \u2022 FRAME 05\" \u2014",
-          "timecode": "EXPOSURE +0.5 EV \u2022 ISO 400"
-        }
-      },
-      "sample_images": [
-        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "DIRECTOR'S CUT",
-        "35MM KODAK 500T"
+        "CineStill 800T • Nightwalks"
       ]
     },
     {
@@ -16664,7 +16169,7 @@
       ],
       "sample_text": [
         "VINTAGE ROLL",
-        "CineStill 800T \u2022 Nightwalks"
+        "CineStill 800T • Nightwalks"
       ]
     },
     {
@@ -16782,7 +16287,7 @@
       ],
       "sample_text": [
         "ANALOG ARCHIVE",
-        "REC \u25cf [01:42:19] \u2022 24 FPS"
+        "REC ● [01:42:19] • 24 FPS"
       ]
     },
     {
@@ -16819,8 +16324,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-          "timecode": "KODAK TRI-X 400 \u2022 B&W"
+          "subtitle": "— HASSELBLAD 500C/M • 80MM F/2.8 —",
+          "timecode": "KODAK TRI-X 400 • B&W"
         }
       },
       "sample_images": [
@@ -16830,53 +16335,6 @@
       "sample_text": [
         "GRAIN & SHADOW",
         "Kodak Tri-X 400 Exp. 24"
-      ]
-    },
-    {
-      "layout_id": "film_120_roll_duo_v2",
-      "name": "120 Medium Format Roll Duo 2",
-      "category": "Film",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#0f0f11",
-        "outer_margin": 40,
-        "gutter": 24
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 40,
-          "y": 40,
-          "width": 488,
-          "height": 1270,
-          "fit_mode": "cover",
-          "border_radius": 6
-        },
-        {
-          "slot_index": 1,
-          "x": 552,
-          "y": 40,
-          "width": 488,
-          "height": 1270,
-          "fit_mode": "cover",
-          "border_radius": 6
-        }
-      ],
-      "overlay": {
-        "type": "cinematic_subtitles",
-        "config": {
-          "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-          "timecode": "KODAK TRI-X 400 \u2022 B&W"
-        }
-      },
-      "sample_images": [
-        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "VINTAGE ROLL",
-        "CineStill 800T \u2022 Nightwalks"
       ]
     },
     {
@@ -16913,8 +16371,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-          "timecode": "KODAK TRI-X 400 \u2022 B&W"
+          "subtitle": "— HASSELBLAD 500C/M • 80MM F/2.8 —",
+          "timecode": "KODAK TRI-X 400 • B&W"
         }
       },
       "sample_images": [
@@ -16960,8 +16418,8 @@
       "overlay": {
         "type": "cinematic_subtitles",
         "config": {
-          "subtitle": "\u2014 HASSELBLAD 500C/M \u2022 80MM F/2.8 \u2014",
-          "timecode": "KODAK TRI-X 400 \u2022 B&W"
+          "subtitle": "— HASSELBLAD 500C/M • 80MM F/2.8 —",
+          "timecode": "KODAK TRI-X 400 • B&W"
         }
       },
       "sample_images": [
@@ -16970,7 +16428,7 @@
       ],
       "sample_text": [
         "ANALOG ARCHIVE",
-        "REC \u25cf [01:42:19] \u2022 24 FPS"
+        "REC ● [01:42:19] • 24 FPS"
       ]
     },
     {
@@ -17017,7 +16475,7 @@
         "type": "location_pill",
         "config": {
           "location": "DOLOMITES, ITALY",
-          "coordinates": "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "coordinates": "46.4102° N, 11.8440° E"
         }
       },
       "sample_images": [
@@ -17027,7 +16485,7 @@
       ],
       "sample_text": [
         "DOLOMITES, ITALY",
-        "46.4102\u00b0 N, 11.8440\u00b0 E"
+        "46.4102° N, 11.8440° E"
       ]
     },
     {
@@ -17317,7 +16775,7 @@
       ],
       "sample_text": [
         "DOLOMITES, ITALY",
-        "46.4102\u00b0 N, 11.8440\u00b0 E"
+        "46.4102° N, 11.8440° E"
       ]
     },
     {
@@ -17480,7 +16938,7 @@
         "type": "location_pill",
         "config": {
           "location": "DOLOMITES, ITALY",
-          "coordinates": "46.4102\u00b0 N, 11.8440\u00b0 E"
+          "coordinates": "46.4102° N, 11.8440° E"
         }
       },
       "sample_images": [
@@ -17490,7 +16948,7 @@
       ],
       "sample_text": [
         "DOLOMITES, ITALY",
-        "46.4102\u00b0 N, 11.8440\u00b0 E"
+        "46.4102° N, 11.8440° E"
       ]
     },
     {
@@ -17537,7 +16995,7 @@
         "type": "location_pill",
         "config": {
           "location": "KYOTO, JAPAN",
-          "coordinates": "35.0116\u00b0 N, 135.7681\u00b0 E"
+          "coordinates": "35.0116° N, 135.7681° E"
         }
       },
       "sample_images": [
@@ -17547,64 +17005,7 @@
       ],
       "sample_text": [
         "KYOTO, JAPAN",
-        "35.0116\u00b0 N, 135.7681\u00b0 E"
-      ]
-    },
-    {
-      "layout_id": "editorial_wanderlust_v3",
-      "name": "Wanderlust Pill SANTORINI",
-      "category": "Editorial",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#0d0f12",
-        "outer_margin": 24,
-        "gutter": 18
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 24,
-          "y": 24,
-          "width": 507,
-          "height": 780,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 1,
-          "x": 549,
-          "y": 24,
-          "width": 507,
-          "height": 780,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 2,
-          "x": 24,
-          "y": 822,
-          "width": 1032,
-          "height": 504,
-          "fit_mode": "cover",
-          "border_radius": 16
-        }
-      ],
-      "overlay": {
-        "type": "location_pill",
-        "config": {
-          "location": "SANTORINI, GREECE",
-          "coordinates": "36.3932\u00b0 N, 25.4615\u00b0 E"
-        }
-      },
-      "sample_images": [
-        "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "SANTORINI, GREECE",
-        "36.3932\u00b0 N, 25.4615\u00b0 E"
+        "35.0116° N, 135.7681° E"
       ]
     },
     {
@@ -17651,7 +17052,7 @@
         "type": "location_pill",
         "config": {
           "location": "REYKJAVIK, ICELAND",
-          "coordinates": "64.1466\u00b0 N, 21.9426\u00b0 W"
+          "coordinates": "64.1466° N, 21.9426° W"
         }
       },
       "sample_images": [
@@ -17661,7 +17062,7 @@
       ],
       "sample_text": [
         "REYKJAVIK, ICELAND",
-        "64.1466\u00b0 N, 21.9426\u00b0 W"
+        "64.1466° N, 21.9426° W"
       ]
     },
     {
@@ -17708,7 +17109,7 @@
         "type": "location_pill",
         "config": {
           "location": "AMALFI COAST, ITALY",
-          "coordinates": "40.6340\u00b0 N, 14.6027\u00b0 E"
+          "coordinates": "40.6340° N, 14.6027° E"
         }
       },
       "sample_images": [
@@ -17718,7 +17119,7 @@
       ],
       "sample_text": [
         "AMALFI COAST, ITALY",
-        "40.6340\u00b0 N, 14.6027\u00b0 E"
+        "40.6340° N, 14.6027° E"
       ]
     },
     {
@@ -17765,7 +17166,7 @@
         "type": "location_pill",
         "config": {
           "location": "ZERMATT, SWITZERLAND",
-          "coordinates": "45.9765\u00b0 N, 7.7491\u00b0 E"
+          "coordinates": "45.9765° N, 7.7491° E"
         }
       },
       "sample_images": [
@@ -17775,7 +17176,7 @@
       ],
       "sample_text": [
         "ZERMATT, SWITZERLAND",
-        "45.9765\u00b0 N, 7.7491\u00b0 E"
+        "45.9765° N, 7.7491° E"
       ]
     },
     {
@@ -17949,7 +17350,7 @@
       ],
       "sample_text": [
         "DOLOMITES, ITALY",
-        "46.4102\u00b0 N, 11.8440\u00b0 E"
+        "46.4102° N, 11.8440° E"
       ]
     },
     {
@@ -18165,7 +17566,7 @@
       ],
       "sample_text": [
         "DOLOMITES, ITALY",
-        "46.4102\u00b0 N, 11.8440\u00b0 E"
+        "46.4102° N, 11.8440° E"
       ]
     },
     {
@@ -19199,206 +18600,6 @@
       ]
     },
     {
-      "layout_id": "scrapbook_diagonal_step_v2",
-      "name": "Staggered Travel Stair Collage 2",
-      "category": "Scrapbook",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#161514",
-        "outer_margin": 28,
-        "gutter": 20
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 28,
-          "y": 28,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 1,
-          "x": 412,
-          "y": 448,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 2,
-          "x": 78,
-          "y": 868,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        }
-      ],
-      "sample_images": [
-        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "WEEKEND ESCAPE",
-        "Coffee & Polaroids"
-      ]
-    },
-    {
-      "layout_id": "scrapbook_diagonal_step_v3",
-      "name": "Staggered Travel Stair Collage 3",
-      "category": "Scrapbook",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#161514",
-        "outer_margin": 28,
-        "gutter": 20
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 28,
-          "y": 28,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 1,
-          "x": 412,
-          "y": 448,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 2,
-          "x": 78,
-          "y": 868,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        }
-      ],
-      "sample_images": [
-        "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "JOURNAL NOTES",
-        "Pages from July"
-      ]
-    },
-    {
-      "layout_id": "scrapbook_diagonal_step_v4",
-      "name": "Staggered Travel Stair Collage 4",
-      "category": "Scrapbook",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#161514",
-        "outer_margin": 28,
-        "gutter": 20
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 28,
-          "y": 28,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 1,
-          "x": 412,
-          "y": 448,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 2,
-          "x": 78,
-          "y": 868,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        }
-      ],
-      "sample_images": [
-        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "SCRAPBOOK VIBES",
-        "Fleeting & Cherished"
-      ]
-    },
-    {
-      "layout_id": "scrapbook_diagonal_step_v5",
-      "name": "Staggered Travel Stair Collage 5",
-      "category": "Scrapbook",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#161514",
-        "outer_margin": 28,
-        "gutter": 20
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 28,
-          "y": 28,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 1,
-          "x": 412,
-          "y": 448,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        },
-        {
-          "slot_index": 2,
-          "x": 78,
-          "y": 868,
-          "width": 640,
-          "height": 390,
-          "fit_mode": "cover",
-          "border_radius": 16
-        }
-      ],
-      "sample_images": [
-        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "SUMMER MEMORIES",
-        "Collected Moments 2026"
-      ]
-    },
-    {
       "layout_id": "scrapbook_postcard_duo_v1",
       "name": "Postcard Artisan Duo 1",
       "category": "Scrapbook",
@@ -20089,56 +19290,6 @@
       ]
     },
     {
-      "layout_id": "polaroid_tri_snap_v2",
-      "name": "3-Snap Polaroid Strip 2",
-      "category": "Polaroid",
-      "canvas": {
-        "width": 1080,
-        "height": 1350,
-        "background_color": "#09090b",
-        "outer_margin": 40,
-        "gutter": 24
-      },
-      "slots": [
-        {
-          "slot_index": 0,
-          "x": 40,
-          "y": 40,
-          "width": 1000,
-          "height": 407,
-          "fit_mode": "cover",
-          "border_radius": 4
-        },
-        {
-          "slot_index": 1,
-          "x": 40,
-          "y": 471,
-          "width": 1000,
-          "height": 407,
-          "fit_mode": "cover",
-          "border_radius": 4
-        },
-        {
-          "slot_index": 2,
-          "x": 40,
-          "y": 902,
-          "width": 1000,
-          "height": 407,
-          "fit_mode": "cover",
-          "border_radius": 4
-        }
-      ],
-      "sample_images": [
-        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80",
-        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80"
-      ],
-      "sample_text": [
-        "STUDIO POLAROID",
-        "One of One Unique Print"
-      ]
-    },
-    {
       "layout_id": "polaroid_tri_snap_v3",
       "name": "3-Snap Polaroid Strip 3",
       "category": "Polaroid",
@@ -20686,6 +19837,414 @@
       "sample_text": [
         "ORIGINAL POLAROID",
         "September 14, 2026"
+      ]
+    },
+    {
+      "layout_id": "magazine_cover_hero",
+      "name": "Magazine Cover Story",
+      "category": "Editorial",
+      "canvas": {
+        "width": 1080,
+        "height": 1350,
+        "background_color": "#0d1018",
+        "outer_margin": 48,
+        "gutter": 20
+      },
+      "slots": [
+        {
+          "slot_index": 0,
+          "x": 48,
+          "y": 48,
+          "width": 984,
+          "height": 860,
+          "fit_mode": "cover",
+          "border_radius": 12
+        },
+        {
+          "slot_index": 1,
+          "x": 48,
+          "y": 928,
+          "width": 482,
+          "height": 374,
+          "fit_mode": "cover",
+          "border_radius": 10
+        },
+        {
+          "slot_index": 2,
+          "x": 550,
+          "y": 928,
+          "width": 482,
+          "height": 374,
+          "fit_mode": "cover",
+          "border_radius": 10
+        }
+      ],
+      "sample_images": [
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+      ],
+      "sample_text": [
+        "JOURNEY: A COLLECTION OF MEMORIES",
+        "Highland wanderlust collection",
+        "October 2026 Editorial Issue"
+      ]
+    },
+    {
+      "layout_id": "editorial_split_asym",
+      "name": "Editorial Split (1 Large + 3 Stacked)",
+      "category": "Editorial",
+      "canvas": {
+        "width": 1080,
+        "height": 1350,
+        "background_color": "#080a0f",
+        "outer_margin": 48,
+        "gutter": 16
+      },
+      "slots": [
+        {
+          "slot_index": 0,
+          "x": 48,
+          "y": 48,
+          "width": 580,
+          "height": 1254,
+          "fit_mode": "cover",
+          "border_radius": 12
+        },
+        {
+          "slot_index": 1,
+          "x": 644,
+          "y": 48,
+          "width": 388,
+          "height": 407,
+          "fit_mode": "cover",
+          "border_radius": 8
+        },
+        {
+          "slot_index": 2,
+          "x": 644,
+          "y": 471,
+          "width": 388,
+          "height": 408,
+          "fit_mode": "cover",
+          "border_radius": 8
+        },
+        {
+          "slot_index": 3,
+          "x": 644,
+          "y": 895,
+          "width": 388,
+          "height": 407,
+          "fit_mode": "cover",
+          "border_radius": 8
+        }
+      ],
+      "sample_images": [
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+      ],
+      "sample_text": [
+        "STYLE STORIES",
+        "Autumn/Winter Lookbook Feature",
+        "Through my lens: Parisian architecture"
+      ]
+    },
+    {
+      "layout_id": "minimal_story_diptych",
+      "name": "Minimal Story Diptych",
+      "category": "Minimalist",
+      "canvas": {
+        "width": 1080,
+        "height": 1350,
+        "background_color": "#0f121a",
+        "outer_margin": 64,
+        "gutter": 32
+      },
+      "slots": [
+        {
+          "slot_index": 0,
+          "x": 64,
+          "y": 80,
+          "width": 460,
+          "height": 680,
+          "fit_mode": "cover",
+          "border_radius": 10
+        },
+        {
+          "slot_index": 1,
+          "x": 556,
+          "y": 590,
+          "width": 460,
+          "height": 680,
+          "fit_mode": "cover",
+          "border_radius": 10
+        }
+      ],
+      "sample_images": [
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+      ],
+      "sample_text": [
+        "GOOD DAYS",
+        "Simple moments, big memories",
+        "Quiet morning reflections"
+      ]
+    },
+    {
+      "layout_id": "clean_editorial_quad",
+      "name": "Clean Editorial Quad",
+      "category": "Editorial",
+      "canvas": {
+        "width": 1080,
+        "height": 1350,
+        "background_color": "#080a0f",
+        "outer_margin": 48,
+        "gutter": 20
+      },
+      "slots": [
+        {
+          "slot_index": 0,
+          "x": 48,
+          "y": 48,
+          "width": 482,
+          "height": 617,
+          "fit_mode": "cover",
+          "border_radius": 6
+        },
+        {
+          "slot_index": 1,
+          "x": 550,
+          "y": 48,
+          "width": 482,
+          "height": 617,
+          "fit_mode": "cover",
+          "border_radius": 6
+        },
+        {
+          "slot_index": 2,
+          "x": 48,
+          "y": 685,
+          "width": 482,
+          "height": 617,
+          "fit_mode": "cover",
+          "border_radius": 6
+        },
+        {
+          "slot_index": 3,
+          "x": 550,
+          "y": 685,
+          "width": 482,
+          "height": 617,
+          "fit_mode": "cover",
+          "border_radius": 6
+        }
+      ],
+      "sample_images": [
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+      ],
+      "sample_text": [
+        "EDITORIAL GALLERY",
+        "Curated visual composition",
+        "Modern aesthetic 4:5 portfolio"
+      ]
+    },
+    {
+      "layout_id": "lifestyle_photo_dump_asym",
+      "name": "Lifestyle Photo Dump",
+      "category": "Minimalist",
+      "canvas": {
+        "width": 1080,
+        "height": 1350,
+        "background_color": "#090b10",
+        "outer_margin": 48,
+        "gutter": 16
+      },
+      "slots": [
+        {
+          "slot_index": 0,
+          "x": 48,
+          "y": 48,
+          "width": 460,
+          "height": 680,
+          "fit_mode": "cover",
+          "border_radius": 8
+        },
+        {
+          "slot_index": 1,
+          "x": 540,
+          "y": 48,
+          "width": 492,
+          "height": 440,
+          "fit_mode": "cover",
+          "border_radius": 8
+        },
+        {
+          "slot_index": 2,
+          "x": 540,
+          "y": 520,
+          "width": 492,
+          "height": 782,
+          "fit_mode": "cover",
+          "border_radius": 8
+        },
+        {
+          "slot_index": 3,
+          "x": 48,
+          "y": 760,
+          "width": 460,
+          "height": 542,
+          "fit_mode": "cover",
+          "border_radius": 8
+        }
+      ],
+      "sample_images": [
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+      ],
+      "sample_text": [
+        "WEEKEND DUMP",
+        "Candid snapshots & warm coffee",
+        "Life lately through 35mm"
+      ]
+    },
+    {
+      "layout_id": "minimal_negative_space",
+      "name": "Negative Space Minimal",
+      "category": "Minimalist",
+      "canvas": {
+        "width": 1080,
+        "height": 1350,
+        "background_color": "#0d1017",
+        "outer_margin": 72,
+        "gutter": 24
+      },
+      "slots": [
+        {
+          "slot_index": 0,
+          "x": 360,
+          "y": 96,
+          "width": 648,
+          "height": 780,
+          "fit_mode": "cover",
+          "border_radius": 4
+        },
+        {
+          "slot_index": 1,
+          "x": 72,
+          "y": 750,
+          "width": 400,
+          "height": 504,
+          "fit_mode": "cover",
+          "border_radius": 4
+        }
+      ],
+      "sample_images": [
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80"
+      ],
+      "sample_text": [
+        "STILLNESS",
+        "Artful negative space and calm textures",
+        "Form follows light"
+      ]
+    },
+    {
+      "layout_id": "fashion_editorial_triptych",
+      "name": "Fashion Editorial Triptych",
+      "category": "Editorial",
+      "canvas": {
+        "width": 1080,
+        "height": 1350,
+        "background_color": "#080a0f",
+        "outer_margin": 48,
+        "gutter": 20
+      },
+      "slots": [
+        {
+          "slot_index": 0,
+          "x": 48,
+          "y": 48,
+          "width": 560,
+          "height": 1254,
+          "fit_mode": "cover",
+          "border_radius": 12
+        },
+        {
+          "slot_index": 1,
+          "x": 640,
+          "y": 48,
+          "width": 392,
+          "height": 606,
+          "fit_mode": "cover",
+          "border_radius": 10
+        },
+        {
+          "slot_index": 2,
+          "x": 640,
+          "y": 696,
+          "width": 392,
+          "height": 606,
+          "fit_mode": "cover",
+          "border_radius": 10
+        }
+      ],
+      "sample_images": [
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1080&q=80"
+      ],
+      "sample_text": [
+        "RUNWAY ATELIER",
+        "Silhouette & drapery study",
+        "Milan Fashion Week Preview"
+      ]
+    },
+    {
+      "layout_id": "portrait_before_after_split",
+      "name": "Before & After Portrait Split",
+      "category": "Editorial",
+      "canvas": {
+        "width": 1080,
+        "height": 1350,
+        "background_color": "#07090e",
+        "outer_margin": 48,
+        "gutter": 16
+      },
+      "slots": [
+        {
+          "slot_index": 0,
+          "x": 48,
+          "y": 48,
+          "width": 476,
+          "height": 1254,
+          "fit_mode": "cover",
+          "border_radius": 8
+        },
+        {
+          "slot_index": 1,
+          "x": 556,
+          "y": 48,
+          "width": 476,
+          "height": 1254,
+          "fit_mode": "cover",
+          "border_radius": 8
+        }
+      ],
+      "sample_images": [
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80",
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80"
+      ],
+      "sample_text": [
+        "BEFORE & AFTER",
+        "Color grade & retouching comparison",
+        "Dual 50/50 vertical split"
       ]
     }
   ]
