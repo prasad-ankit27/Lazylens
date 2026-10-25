@@ -335,6 +335,16 @@ export default function Home() {
   const [previewModalTemplate, setPreviewModalTemplate] = useState<LayoutPreset | null>(null);
   const [confirmApplyModalTemplate, setConfirmApplyModalTemplate] = useState<LayoutPreset | null>(null);
 
+  // Dedicated Enhance All Images state (Phase 3)
+  const [isEnhancing, setIsEnhancing] = useState<boolean>(false);
+  const [enhanceLoadingStep, setEnhanceLoadingStep] = useState<string>("Analyzing image lighting & dynamic range…");
+  const [enhanceError, setEnhanceError] = useState<string | null>(null);
+  const [enhanceScope, setEnhanceScope] = useState<"current" | "all">("current");
+  const [beforeAfterMode, setBeforeAfterMode] = useState<"after" | "before">("after");
+  const [selectedPreviewPhotoIdx, setSelectedPreviewPhotoIdx] = useState<number>(0);
+  const [enhancedBatchCount, setEnhancedBatchCount] = useState<number | null>(null);
+  const [isHoldingCompare, setIsHoldingCompare] = useState<boolean>(false);
+
   const [mediaLibraryPool, setMediaLibraryPool] = useState<PhotoItem[]>([
     ...DEFAULT_DEMO_PHOTOS,
     { id: "lib_1", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80", file: null, name: "Sunset Horizon" },
@@ -1390,6 +1400,143 @@ export default function Home() {
     setPreviewModalTemplate(null);
   };
 
+  // Dedicated Enhance All Images Handlers (Phase 3)
+  const isCurrentSlideEnhanced = (activeSlide?.transforms || []).some(
+    (t) => (t.brightness || 0) > 0 || (t.contrast || 0) > 0 || (t.saturation || 0) > 0 || t.filter === "natural"
+  );
+
+  const handleEnhanceAllImages = async (scope: "current" | "all" = enhanceScope) => {
+    if (isEnhancing) return;
+
+    setIsEnhancing(true);
+    setEnhanceError(null);
+    setEnhanceLoadingStep("Analyzing image lighting & dynamic range…");
+
+    // Gather all target image URLs
+    const targetPhotos = scope === "all"
+      ? slides.flatMap((s) => s.photos || [])
+      : activeSlide?.photos || [];
+
+    const imageUrls = targetPhotos
+      .map((p) => p.url)
+      .filter((u): u is string => typeof u === "string" && u.trim().length > 0);
+
+    if (imageUrls.length === 0) {
+      setEnhanceError("No images found in the selected collection to enhance.");
+      setIsEnhancing(false);
+      return;
+    }
+
+    const timer1 = setTimeout(() => {
+      setEnhanceLoadingStep("Calibrating contrast, color balance & clarity…");
+    }, 800);
+
+    const timer2 = setTimeout(() => {
+      setEnhanceLoadingStep("Applying non-destructive visual adjustments…");
+    }, 1600);
+
+    // Snapshot pre-enhancement slides
+    const preEnhancementSlides = slides;
+
+    try {
+      const res = await fetch("/api/ai/enhance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          images: imageUrls,
+          slide_index: activeSlideIndex,
+          scope,
+        }),
+      });
+
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `Image enhancement failed (${res.status})`);
+      }
+
+      const adj = data.preset_adjustments || {
+        brightness: 8,
+        contrast: 12,
+        saturation: 15,
+        warmth: 4,
+        sharpness: 20,
+        filter: "natural",
+      };
+
+      // Apply enhancements to all images in target scope
+      let updatedSlides: CarouselSlide[];
+
+      if (scope === "all") {
+        updatedSlides = slides.map((slide) => {
+          const nextTransforms = (slide.photos || []).map((_, pIdx) => {
+            const cur = slide.transforms[pIdx] || { ...DEFAULT_TRANSFORM };
+            return {
+              ...cur,
+              brightness: Math.min(100, (cur.brightness || 0) + adj.brightness),
+              contrast: Math.min(100, (cur.contrast || 0) + adj.contrast),
+              saturation: Math.min(100, (cur.saturation || 0) + adj.saturation),
+              warmth: Math.min(100, (cur.warmth || 0) + adj.warmth),
+              filter: cur.filter === "none" || !cur.filter ? (adj.filter as any) : cur.filter,
+            };
+          });
+          return {
+            ...slide,
+            transforms: nextTransforms,
+          };
+        });
+      } else {
+        updatedSlides = slides.map((slide, sIdx) => {
+          if (sIdx !== activeSlideIndex) return slide;
+          const nextTransforms = (slide.photos || []).map((_, pIdx) => {
+            const cur = slide.transforms[pIdx] || { ...DEFAULT_TRANSFORM };
+            return {
+              ...cur,
+              brightness: Math.min(100, (cur.brightness || 0) + adj.brightness),
+              contrast: Math.min(100, (cur.contrast || 0) + adj.contrast),
+              saturation: Math.min(100, (cur.saturation || 0) + adj.saturation),
+              warmth: Math.min(100, (cur.warmth || 0) + adj.warmth),
+              filter: cur.filter === "none" || !cur.filter ? (adj.filter as any) : cur.filter,
+            };
+          });
+          return {
+            ...slide,
+            transforms: nextTransforms,
+          };
+        });
+      }
+
+      // Single atomic push to undo/redo history
+      setSlides(updatedSlides);
+      pushHistory(updatedSlides);
+
+      const count = scope === "all" ? targetPhotos.length : (activeSlide?.photos?.length || 0);
+      setEnhancedBatchCount(count);
+      setBeforeAfterMode("after");
+      showToast(`Enhanced all ${count} images with lighting & clarity boost`);
+    } catch (err: any) {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      console.error("Enhancement error:", err);
+      // Restore clean state if error occurs
+      setSlides(preEnhancementSlides);
+      setEnhanceError(err?.message || "Failed to enhance images. Please check service status.");
+      showToast("Error: Image enhancement failed. State restored.");
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
+
+  const handleUndoEnhancement = () => {
+    handleUndo();
+  };
+
+  const handleRedoEnhancement = () => {
+    handleRedo();
+  };
+
   // AI Actions Trigger
   const handleTriggerAiAction = async (action: "captions" | "layouts" | "enhance" | "bg" | "hashtags") => {
     setActiveAiModal(action);
@@ -1407,6 +1554,10 @@ export default function Home() {
       if (suggestedTemplates.length === 0 && !isSuggestingTemplates) {
         handleSuggestTemplates(false);
       }
+      return;
+    }
+
+    if (action === "enhance") {
       return;
     }
 
@@ -3295,6 +3446,236 @@ export default function Home() {
                               </div>
                             )}
                           </div>
+                        ) : activeAiModal === "enhance" ? (
+                          <div className="ai-enhance-view">
+                            {/* Top Back Navigation */}
+                            <div className="ai-captions-nav">
+                              <button className="ai-back-btn" onClick={() => setActiveAiModal(null)}>
+                                <ChevronLeft size={14} /> Back to AI Tools
+                              </button>
+                              <span className="ai-badge-model" style={{ color: "#06b6d4", borderColor: "rgba(6, 182, 212, 0.3)" }}>
+                                Lighting & Clarity AI
+                              </span>
+                            </div>
+
+                            {/* Section Header */}
+                            <div className="ai-captions-header">
+                              <div className="ai-captions-title-row">
+                                <div className="ai-captions-title">Enhance All Images</div>
+                              </div>
+                              <div className="ai-captions-subtitle">
+                                Calibrate lighting, contrast, vividness & sharpness across all photos in one click
+                              </div>
+
+                              {/* Scope Selector */}
+                              <div className="ai-enhance-scope-bar" style={{ marginTop: 8 }}>
+                                <button
+                                  className={`ai-enhance-scope-btn${enhanceScope === "current" ? " active" : ""}`}
+                                  onClick={() => setEnhanceScope("current")}
+                                  disabled={isEnhancing}
+                                >
+                                  <span>Current Slide ({activeSlide.photos.length})</span>
+                                </button>
+                                <button
+                                  className={`ai-enhance-scope-btn${enhanceScope === "all" ? " active" : ""}`}
+                                  onClick={() => setEnhanceScope("all")}
+                                  disabled={isEnhancing}
+                                >
+                                  <span>All Slides ({slides.reduce((acc, s) => acc + (s.photos?.length || 0), 0)})</span>
+                                </button>
+                              </div>
+
+                              {/* Mini Photos Preview Strip */}
+                              <div className="ai-photos-preview-strip" style={{ marginTop: 10 }}>
+                                {activeSlide.photos.map((p, idx) => {
+                                  const isSelected = selectedPreviewPhotoIdx === idx;
+                                  return (
+                                    <div
+                                      key={`enhance-strip-${p.id || idx}`}
+                                      className="ai-strip-thumb"
+                                      style={{
+                                        cursor: "pointer",
+                                        border: isSelected ? "2px solid #06b6d4" : undefined,
+                                        boxShadow: isSelected ? "0 0 8px rgba(6, 182, 212, 0.4)" : undefined,
+                                      }}
+                                      onClick={() => setSelectedPreviewPhotoIdx(idx)}
+                                      title={`Click to inspect Photo #${idx + 1}`}
+                                    >
+                                      <img
+                                        src={p.url}
+                                        alt=""
+                                        onError={(e) => {
+                                          (e.currentTarget as HTMLImageElement).src = "/demo/demo1.jpg";
+                                        }}
+                                      />
+                                      <span className="ai-strip-badge">{idx + 1}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Loading State */}
+                            {isEnhancing && (
+                              <div className="ai-captions-loading">
+                                <div className="ai-loading-spinner-wrap" style={{ color: "#06b6d4" }}>
+                                  <RotateCw size={20} className="ai-spin-icon" />
+                                </div>
+                                <div className="ai-loading-step-text">{enhanceLoadingStep}</div>
+                                <div className="ai-loading-subtext">Non-destructive adjustment of lighting, contrast, color & sharpness</div>
+                                <div className="ai-skeleton-stack">
+                                  {[1, 2, 3].map((n) => (
+                                    <div key={n} className="ai-caption-skeleton" style={{ height: 48 }} />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Error State */}
+                            {!isEnhancing && enhanceError && (
+                              <div className="ai-caption-error-box">
+                                <div className="ai-error-header">
+                                  <AlertCircle size={16} className="ai-error-icon" />
+                                  <span className="ai-error-title">Enhancement Failed</span>
+                                </div>
+                                <p className="ai-error-desc">{enhanceError}</p>
+                                <button
+                                  className="btn-retry"
+                                  onClick={() => handleEnhanceAllImages(enhanceScope)}
+                                >
+                                  <RotateCw size={13} /> Retry Enhancement
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Success / Undo Bar */}
+                            {!isEnhancing && isCurrentSlideEnhanced && (
+                              <div className="ai-enhance-undo-bar">
+                                <div className="ai-enhance-status-label">
+                                  <Check size={14} color="#06b6d4" />
+                                  <span>Enhanced ({enhanceScope === "all" ? "All Slides" : `Slide ${activeSlideIndex + 1}`})</span>
+                                </div>
+                                <div className="ai-enhance-undo-actions">
+                                  <button
+                                    className="ai-enhance-undo-btn"
+                                    onClick={handleUndoEnhancement}
+                                    disabled={historyIndex <= 0}
+                                    title="Undo enhancement across all images (Ctrl+Z)"
+                                  >
+                                    <Undo2 size={12} /> Undo
+                                  </button>
+                                  <button
+                                    className="ai-enhance-undo-btn"
+                                    onClick={handleRedoEnhancement}
+                                    disabled={historyIndex >= history.length - 1}
+                                    title="Redo enhancement across all images (Ctrl+Y)"
+                                  >
+                                    <Redo2 size={12} /> Redo
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Before / After Comparison Card */}
+                            {!isEnhancing && activeSlide.photos.length > 0 && (
+                              <div className="ai-comparison-card">
+                                <div className="ai-comparison-header">
+                                  <span className="ai-comparison-title">
+                                    Photo #{selectedPreviewPhotoIdx + 1} Preview
+                                  </span>
+                                  <div className="ai-comparison-toggle-group">
+                                    <button
+                                      className={`ai-comp-toggle-btn${beforeAfterMode === "before" && !isHoldingCompare ? " active" : ""}`}
+                                      onClick={() => setBeforeAfterMode("before")}
+                                    >
+                                      Before
+                                    </button>
+                                    <button
+                                      className={`ai-comp-toggle-btn${beforeAfterMode === "after" && !isHoldingCompare ? " active" : ""}`}
+                                      onClick={() => setBeforeAfterMode("after")}
+                                    >
+                                      After
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Comparison Frame */}
+                                <div className="ai-comparison-frame">
+                                  {(() => {
+                                    const previewPhoto = activeSlide.photos[selectedPreviewPhotoIdx] || activeSlide.photos[0];
+                                    const isShowingBefore = beforeAfterMode === "before" || isHoldingCompare;
+                                    const enhancedFilterStyle = "saturate(1.15) contrast(1.12) brightness(1.08) sepia(0.04)";
+
+                                    return (
+                                      <>
+                                        <img
+                                          src={previewPhoto?.url || "/demo/demo1.jpg"}
+                                          alt=""
+                                          style={{
+                                            filter: isShowingBefore ? "none" : enhancedFilterStyle,
+                                          }}
+                                          onError={(e) => {
+                                            (e.currentTarget as HTMLImageElement).src = "/demo/demo1.jpg";
+                                          }}
+                                        />
+                                        <span className={`ai-comp-badge ${isShowingBefore ? "badge-before" : "badge-after"}`}>
+                                          {isShowingBefore ? "Before (Original)" : "After (Enhanced)"}
+                                        </span>
+
+                                        <button
+                                          className="ai-hold-compare-btn"
+                                          onMouseDown={() => setIsHoldingCompare(true)}
+                                          onMouseUp={() => setIsHoldingCompare(false)}
+                                          onMouseLeave={() => setIsHoldingCompare(false)}
+                                          onTouchStart={() => setIsHoldingCompare(true)}
+                                          onTouchEnd={() => setIsHoldingCompare(false)}
+                                          title="Hold mouse down to view original unenhanced photo"
+                                        >
+                                          Hold to Compare
+                                        </button>
+                                      </>
+                                    );
+                                  })()}
+                                </div>
+
+                                {/* Applied Metrics Chips */}
+                                <div className="ai-metrics-chips">
+                                  <div className="ai-metric-chip">
+                                    <span className="ai-metric-label">Lighting</span>
+                                    <span className="ai-metric-val">+8%</span>
+                                  </div>
+                                  <div className="ai-metric-chip">
+                                    <span className="ai-metric-label">Contrast</span>
+                                    <span className="ai-metric-val">+12%</span>
+                                  </div>
+                                  <div className="ai-metric-chip">
+                                    <span className="ai-metric-label">Saturation</span>
+                                    <span className="ai-metric-val">+15%</span>
+                                  </div>
+                                  <div className="ai-metric-chip">
+                                    <span className="ai-metric-label">Sharpness</span>
+                                    <span className="ai-metric-val">+20%</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Primary Trigger / Re-enhance Button */}
+                            {!isEnhancing && (
+                              <button
+                                className="ai-enhance-btn-primary"
+                                onClick={() => handleEnhanceAllImages(enhanceScope)}
+                                disabled={isEnhancing}
+                              >
+                                <Sun size={15} />
+                                <span>
+                                  {isCurrentSlideEnhanced
+                                    ? `Re-apply Enhancement (${enhanceScope === "all" ? "All Slides" : `${activeSlide.photos.length} Photos`})`
+                                    : `Enhance All Images (${enhanceScope === "all" ? "All Slides" : `${activeSlide.photos.length} Photos`})`}
+                                </span>
+                              </button>
+                            )}
+                          </div>
                         ) : (
                           <>
                             <div className="inspector-section-header">
@@ -3347,13 +3728,20 @@ export default function Home() {
                                 </div>
                               </div>
 
-                              <div className="ai-tool-card" onClick={() => handleTriggerAiAction("enhance")}>
+                              <div
+                                className="ai-tool-card"
+                                onClick={() => setActiveAiModal("enhance")}
+                              >
                                 <div className="ai-card-icon-box" style={{ background: "rgba(6,182,212,0.15)", border: "1px solid rgba(6,182,212,0.3)", color: "#06b6d4" }}>
                                   <Sun size={16} />
                                 </div>
                                 <div className="ai-card-info">
                                   <div className="ai-card-title">Enhance Photos</div>
-                                  <div className="ai-card-desc">Auto improve lighting, contrast, and vivid colors</div>
+                                  <div className="ai-card-desc">
+                                    {isCurrentSlideEnhanced
+                                      ? `All ${activeSlide.photos.length} photos enhanced • Click to inspect`
+                                      : `Auto improve lighting, contrast, and vivid colors for all ${activeSlide.photos.length} photos`}
+                                  </div>
                                 </div>
                               </div>
 
