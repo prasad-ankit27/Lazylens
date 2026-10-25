@@ -1,0 +1,44 @@
+services:
+  # Next.js Frontend Web Service
+  - type: web
+    name: lazylens-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_BASE_URL
+        fromService:
+          type: web
+          name: lazylens-backend
+          property: host
+
+  # FastAPI Python Backend Web Service
+  - type: web
+    name: lazylens-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn tools.server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: CANVAS_WIDTH
+        value: "1080"
+      - key: CANVAS_HEIGHT
+        value: "1350"
+      - key: DEFAULT_BG_COLOR
+        value: "#121214"
+      - key: OUTPUT_FORMAT
+        value: "JPEG"
+      - key: OUTPUT_QUALITY
+        value: "95"
+      - key: TMP_DIR
+        value: ".tmp"
+      - key: OUTPUT_DIR
+        value: "output"
+      - key: PRESETS_FILE
+        value: "architecture/preset_layouts.json"
+      - key: BACKEND_HOST
+        value: "0.0.0.0"

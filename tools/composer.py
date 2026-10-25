@@ -42,15 +42,39 @@ def hex_to_rgba(hex_code: str) -> tuple:
         return (18, 18, 20, 255)
 
 
-def get_font(size: int = 24, bold: bool = False, mono: bool = False) -> ImageFont.ImageFont:
+def get_font(size: int = 24, font_name: str = "", bold: bool = False, mono: bool = False) -> ImageFont.ImageFont:
     """
-    Loads appropriate system font with fallback to Pillow default.
+    Loads appropriate system font based on font_name and style with fallback to Pillow default.
     """
+    fn = (font_name or "").lower()
     candidates = []
-    if mono:
+
+    # Map candidate categories
+    if any(k in fn for k in ["serif", "playfair", "cormorant", "dm serif", "abril"]):
         candidates = [
+            "C:\\Windows\\Fonts\\georgiab.ttf" if bold else "C:\\Windows\\Fonts\\georgia.ttf",
+            "C:\\Windows\\Fonts\\timesbd.ttf" if bold else "C:\\Windows\\Fonts\\times.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        ]
+    elif any(k in fn for k in ["caveat", "patrick", "kalam", "hand"]):
+        candidates = [
+            "C:\\Windows\\Fonts\\segoeprb.ttf" if bold else "C:\\Windows\\Fonts\\segoepr.ttf",
+            "C:\\Windows\\Fonts\\comicbd.ttf" if bold else "C:\\Windows\\Fonts\\comic.ttf",
+        ]
+    elif any(k in fn for k in ["vibes", "allura", "sacramento", "script", "calligraphy"]):
+        candidates = [
+            "C:\\Windows\\Fonts\\segoescb.ttf" if bold else "C:\\Windows\\Fonts\\segoesc.ttf",
+            "C:\\Windows\\Fonts\\segoeprb.ttf",
+        ]
+    elif any(k in fn for k in ["bebas", "anton", "oswald", "impact", "display"]):
+        candidates = [
+            "C:\\Windows\\Fonts\\impact.ttf",
+            "C:\\Windows\\Fonts\\ariblk.ttf",
+        ]
+    elif mono or any(k in fn for k in ["mono", "elite", "typewriter", "consola", "cour"]):
+        candidates = [
+            "C:\\Windows\\Fonts\\courbd.ttf" if bold else "C:\\Windows\\Fonts\\cour.ttf",
             "C:\\Windows\\Fonts\\consola.ttf",
-            "C:\\Windows\\Fonts\\cour.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
         ]
     elif bold:
@@ -493,7 +517,7 @@ def draw_text_element(canvas: Image.Image, text_el: Dict[str, Any]) -> None:
 
     is_bold = "bold" in font_name.lower()
     is_mono = "mono" in font_name.lower() or "consola" in font_name.lower()
-    font = get_font(size=size, bold=is_bold, mono=is_mono)
+    font = get_font(size=size, font_name=font_name, bold=is_bold, mono=is_mono)
     fill_rgba = hex_to_rgba(color_hex)
 
     if math.isclose(rotation, 0.0, abs_tol=1e-5):
