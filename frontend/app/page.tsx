@@ -224,6 +224,7 @@ export default function Home() {
   // Right Inspector active tab
   const [rightInspectorTab, setRightInspectorTab] = useState<"edit" | "layers" | "ai">("edit");
   const [canvasTool, setCanvasTool] = useState<"select" | "move" | "crop" | "rotate" | "flip" | "fit" | "fill">("select");
+  const [showAllFilters, setShowAllFilters] = useState<boolean>(false);
 
   // Canvas View Controls
   const [zoomLevel, setZoomLevel] = useState<number>(100);
@@ -2082,9 +2083,21 @@ export default function Home() {
                             {/* 4. Filters Section */}
                             <div className="inspector-section">
                               <div className="inspector-section-header">
-                                <span className="inspector-section-label">Filters</span>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                  <SlidersHorizontal size={13} color="var(--text-secondary)" />
+                                  <span className="inspector-section-label" style={{ color: "var(--text-primary)", fontSize: 12, fontWeight: 700, textTransform: "none", letterSpacing: "normal" }}>Filters</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowAllFilters(!showAllFilters)}
+                                  className="filter-see-all-btn"
+                                  title={showAllFilters ? "Collapse filter grid" : "Expand all filters"}
+                                >
+                                  <span>{showAllFilters ? "Collapse" : "See all"}</span>
+                                  <ChevronRight size={11} style={{ transform: showAllFilters ? "rotate(-90deg)" : "none", transition: "transform 0.15s ease" }} />
+                                </button>
                               </div>
-                              <div className="filters-carousel-grid">
+                              <div className={`filters-strip${showAllFilters ? " expanded" : ""}`}>
                                 {FILTER_PRESETS.map((f) => {
                                   const isActive = (activeSlotTransform.filter || "none") === f.id;
                                   const sIdx = selectedSlotIndex ?? 0;
@@ -2092,16 +2105,17 @@ export default function Home() {
                                     <div
                                       key={f.id}
                                       onClick={() => updateSlotTransform(sIdx, { filter: f.id })}
-                                      className={`filter-preset-card${isActive ? " active" : ""}`}
+                                      className={`filter-thumb-card${isActive ? " active" : ""}`}
+                                      title={`${f.name} filter`}
                                     >
-                                      <div className="filter-thumb">
+                                      <div className="filter-preview-box">
                                         <img
                                           src={photos[sIdx]?.url || getPresetSlotImageUrl(activePreset, sIdx)}
-                                          alt=""
+                                          alt={f.name}
                                           style={{ filter: f.filter }}
                                         />
                                       </div>
-                                      <span className="filter-name">{f.name}</span>
+                                      <span className="filter-label">{f.name}</span>
                                     </div>
                                   );
                                 })}
