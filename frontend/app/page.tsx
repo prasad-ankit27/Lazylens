@@ -213,31 +213,7 @@ function TemplatePreview({ preset, active, className, onSelect }: TemplatePrevie
 }
 
 const INITIAL_SLIDES: CarouselSlide[] = [
-  {
-    ...createSlideFromPreset("slide_1", "grid_2x2"),
-    textElements: [
-      {
-        id: "text_initial_1",
-        text: "Adventure",
-        font: "Playfair Display",
-        color: "#FFFFFF",
-        size: 56,
-        weight: 700,
-        align: "center",
-        letterSpacing: 1,
-        lineHeight: 1.2,
-        opacity: 100,
-        x: 540,
-        y: 675,
-        rotation: 0,
-        shadow: true,
-        locked: false,
-        hidden: false,
-      },
-    ],
-  },
-  createSlideFromPreset("slide_2", "wanderlust_pill"),
-  createSlideFromPreset("slide_3", "cinematic_letterbox"),
+  createSlideFromPreset("slide_1", "grid_2x2"),
 ];
 
 const FILTER_PRESETS: { id: SlotTransform["filter"]; name: string; filter: string }[] = [
@@ -255,8 +231,8 @@ export default function Home() {
   const [historyIndex, setHistoryIndex] = useState<number>(0);
   const [activeSlideIndex, setActiveSlideIndex] = useState<number>(0);
 
-  // Template selection state: starts null until user chooses a template
-  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+  // Template selection state: reflects current active template
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>("grid_2x2");
   const [favorites, setFavorites] = useState<Set<string>>(new Set(["grid_2x2", "film_diary", "nature_escape"]));
 
   // Selection state (unified layer selection)
@@ -658,34 +634,34 @@ export default function Home() {
     }
   };
 
+  // Select a template from library and enter Studio with only that template
+  const handleSelectTemplateCard = (preset: LayoutPreset) => {
+    const slideId = `slide_${Date.now()}_1`;
+    const newSlide = createSlideFromPreset(slideId, preset.layout_id);
+
+    setSlides([newSlide]);
+    setHistory([[newSlide]]);
+    setHistoryIndex(0);
+    setActiveSlideIndex(0);
+    setSelectedPresetId(preset.layout_id);
+    setSelectedLayer({ type: "slot", id: 0 });
+    setProjectTitle(preset.name);
+    setCanvasTool("select");
+
+    // Reset transient AI state for clean template initialization
+    setGeneratedCaptions([]);
+    setGeneratedHashtagSets([]);
+    setSuggestedTemplates([]);
+    setSceneSummary(null);
+
+    setAppView("editor");
+    showToast(`Loaded ${preset.name} template`);
+  };
+
   // Select a preset template
   const handleSelectPreset = (presetId: string) => {
     const preset = PRESET_LAYOUTS.find((p) => p.layout_id === presetId) || PRESET_LAYOUTS[0];
-    setSelectedPresetId(presetId);
-    updateActiveSlide((slide) => {
-      const photos: PhotoItem[] = preset.slots.map((_, sIdx) => ({
-        id: `photo_${preset.layout_id}_${sIdx}`,
-        url: getPresetSlotImageUrl(preset, sIdx),
-        file: null,
-        name: `${preset.name} - Slot #${sIdx + 1}`,
-      }));
-      const transforms: SlotTransform[] = preset.slots.map(() => ({ ...DEFAULT_TRANSFORM }));
-      const alignments: ("top" | "center" | "bottom")[] = preset.slots.map(() => "center" as const);
-      return {
-        ...slide,
-        presetId: preset.layout_id,
-        photos,
-        transforms,
-        alignments,
-      };
-    });
-    showToast(`Applied ${preset.name} template`);
-  };
-
-  // Select a template from library and enter Studio
-  const handleSelectTemplateCard = (preset: LayoutPreset) => {
-    handleSelectPreset(preset.layout_id);
-    setAppView("editor");
+    handleSelectTemplateCard(preset);
   };
 
   // Slide management
@@ -4091,7 +4067,7 @@ export default function Home() {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
                 {savedProjects.map((p) => (
-                  <div key={p.id} className="project-card" onClick={() => { setProjectTitle(p.title); setAppView("editor"); }}>
+                  <div key={p.id} className="project-card" onClick={() => { setProjectTitle(p.title); setSelectedPresetId(slides[0]?.presetId || "grid_2x2"); setAppView("editor"); }}>
                     <div className="project-thumb">
                       <img src={p.thumbnail} alt="" />
                       <div className="project-slides-badge">{p.slidesCount} Slides</div>
