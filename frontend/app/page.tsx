@@ -21,8 +21,14 @@ import {
   Lock, Unlock, Maximize2, Minimize2, MousePointer, FlipHorizontal,
   FlipVertical, Crop, Magnet, MoreHorizontal, MoreVertical, Undo2,
   Redo2, Cloud, Sparkle, Smile, Sun, Ratio, CheckCheck, Square,
-  AlignLeft, AlignCenter, AlignRight,
+  AlignLeft, AlignCenter, AlignRight, AlertCircle,
 } from "lucide-react";
+
+interface CaptionSuggestion {
+  tone: string;
+  label: string;
+  text: string;
+}
 
 interface CaptionPayload {
   summary?: string;
@@ -299,6 +305,15 @@ export default function Home() {
   // AI Studio interactive review modal
   const [activeAiModal, setActiveAiModal] = useState<"captions" | "layouts" | "enhance" | "bg" | "hashtags" | null>(null);
   const [aiSuggestions, setAiSuggestions] = useState<any>(null);
+
+  // Dedicated AI Captions state (Phase 1)
+  const [generatedCaptions, setGeneratedCaptions] = useState<CaptionSuggestion[]>([]);
+  const [recentCaptions, setRecentCaptions] = useState<string[]>([]);
+  const [isGeneratingCaptions, setIsGeneratingCaptions] = useState<boolean>(false);
+  const [captionLoadingStep, setCaptionLoadingStep] = useState<string>("Analyzing slide photos with AI vision…");
+  const [captionError, setCaptionError] = useState<string | null>(null);
+  const [sceneSummary, setSceneSummary] = useState<string | null>(null);
+  const [copiedCaptionIdx, setCopiedCaptionIdx] = useState<number | null>(null);
 
   const [mediaLibraryPool, setMediaLibraryPool] = useState<PhotoItem[]>([
     ...DEFAULT_DEMO_PHOTOS,
@@ -1063,9 +1078,136 @@ export default function Home() {
     }
   };
 
+  // Resolves image to data URL or path for context-aware multi-image AI analysis
+  const getClientImagePayload = async (photo: PhotoItem): Promise<string> => {
+    if (photo.file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(photo.url);
+        reader.readAsDataURL(photo.file!);
+      });
+    }
+    if (photo.url && photo.url.startsWith("blob:")) {
+      try {
+        const blobRes = await fetch(photo.url);
+        const blob = await blobRes.blob();
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = () => resolve(photo.url);
+          reader.readAsDataURL(blob);
+        });
+      } catch {
+        return photo.url;
+      }
+    }
+    return photo.url || "";
+  };
+
+  // Phase 1: Context-Aware Caption Generation (analyzes all images in active slide)
+  const handleGenerateCaptions = async (isRefresh = false) => {
+    if (isGeneratingCaptions) return;
+    setIsGeneratingCaptions(true);
+    setCaptionError(null);
+    setCaptionLoadingStep("Analyzing slide photos with AI vision…");
+
+    // Gather all photos belonging to the current slide context
+    const slidePhotos = activeSlide?.photos || [];
+    const resolvedUrls = await Promise.all(slidePhotos.map(getClientImagePayload));
+    const imageUrls = resolvedUrls.filter(Boolean);
+
+    // Fallback if slide has no photos: use active template sample images
+    if (imageUrls.length === 0 && activePreset?.sample_images) {
+      imageUrls.push(...activePreset.sample_images);
+    }
+
+    if (imageUrls.length === 0) {
+      setCaptionError("No images found on the active slide to analyze.");
+      setIsGeneratingCaptions(false);
+      return;
+    }
+
+    const stepTimer = setTimeout(() => {
+      setCaptionLoadingStep("Synthesizing 5 distinct perspective captions…");
+    }, 4500);
+
+    try {
+      const res = await fetch("/api/ai/captions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          images: imageUrls,
+          recent_captions: recentCaptions,
+          title: projectTitle,
+          template_name: activePreset?.name,
+        }),
+      });
+
+      clearTimeout(stepTimer);
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `Caption generation failed (${res.status})`);
+      }
+
+      if (data.captions && Array.isArray(data.captions) && data.captions.length > 0) {
+        setGeneratedCaptions(data.captions);
+        setSceneSummary(data.scene_summary || null);
+
+        // Track normalized recent captions to avoid repetition across refreshes
+        const newTexts = data.captions.map((c: CaptionSuggestion) => c.text);
+        setRecentCaptions((prev) => {
+          const combined = [...prev, ...newTexts];
+          return combined.slice(-25);
+        });
+
+        showToast(isRefresh ? "Refreshed 5 new captions" : "Generated 5 tailored captions");
+      } else {
+        throw new Error("Received empty captions list from generation service.");
+      }
+    } catch (err: any) {
+      console.error("Caption generation error:", err);
+      setCaptionError(err?.message || "Failed to generate captions. Please check that Ollama AI service is running.");
+      showToast("AI Service Error: Failed to generate captions");
+    } finally {
+      clearTimeout(stepTimer);
+      setIsGeneratingCaptions(false);
+    }
+  };
+
+  const handleCopyCaption = (text: string, index: number) => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text);
+    }
+    setCopiedCaptionIdx(index);
+    showToast("Caption copied to clipboard");
+    setTimeout(() => {
+      setCopiedCaptionIdx(null);
+    }, 2000);
+  };
+
+  const handleApplyCaptionToCanvas = (text: string) => {
+    handleAddTextElement({
+      text: text,
+      font: "Inter",
+      size: 34,
+    });
+    showToast("Added caption as text layer to slide");
+  };
+
   // AI Actions Trigger
   const handleTriggerAiAction = async (action: "captions" | "layouts" | "enhance" | "bg" | "hashtags") => {
     setActiveAiModal(action);
+
+    if (action === "captions") {
+      // Trigger context-aware caption generation if not already generated
+      if (generatedCaptions.length === 0 && !isGeneratingCaptions) {
+        handleGenerateCaptions(false);
+      }
+      return;
+    }
+
     setAiSuggestions(null);
     showToast(`AI Studio: Analyzing ${action}…`);
 
@@ -1084,16 +1226,7 @@ export default function Home() {
         const data = await res.json();
         setAiSuggestions(data.result);
       } else {
-        if (action === "captions") {
-          setAiSuggestions({
-            options: [
-              "Golden hour magic that never fades 🌅",
-              "Collect moments, never things.",
-              "Lost in the right direction ✨",
-              "Stories told without a single word.",
-            ],
-          });
-        } else if (action === "hashtags") {
+        if (action === "hashtags") {
           setAiSuggestions({
             tags: ["#photogram", "#creativeflow", "#visualstory", "#lazylens", "#contentcreator", "#aestheticpost"],
           });
@@ -1104,15 +1237,7 @@ export default function Home() {
         }
       }
     } catch {
-      if (action === "captions") {
-        setAiSuggestions({
-          options: [
-            "Good friends, brighter days.",
-            "Wanderlust state of mind.",
-            "Living between moments.",
-          ],
-        });
-      } else if (action === "hashtags") {
+      if (action === "hashtags") {
         setAiSuggestions({
           tags: ["#lazylens", "#visualstory", "#aesthetic"],
         });
@@ -2627,125 +2752,279 @@ export default function Home() {
                     {/* ── TAB 3: STUDIO AI TOOLS ──────────────────────────── */}
                     {rightInspectorTab === "ai" && (
                       <div className="inspector-section">
-                        <div className="inspector-section-header">
-                          <span className="inspector-section-label">AI Studio Suite</span>
-                          <span className="inspector-section-meta">One-Click Actions</span>
-                        </div>
-
-                        <div className="ai-cards-stack">
-                          <div className="ai-tool-card" onClick={() => handleTriggerAiAction("captions")}>
-                            <div className="ai-card-icon-box" style={{ background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)", color: "#a855f7" }}>
-                              <Sparkles size={16} />
-                            </div>
-                            <div className="ai-card-info">
-                              <div className="ai-card-title">Generate Captions</div>
-                              <div className="ai-card-desc">Get creative captions tailored for this post</div>
-                            </div>
-                          </div>
-
-                          <div className="ai-tool-card" onClick={() => handleTriggerAiAction("layouts")}>
-                            <div className="ai-card-icon-box" style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981" }}>
-                              <Layout size={16} />
-                            </div>
-                            <div className="ai-card-info">
-                              <div className="ai-card-title">Suggest Layouts</div>
-                              <div className="ai-card-desc">Get alternative design variations for {activePreset.slots.length} photos</div>
-                            </div>
-                          </div>
-
-                          <div className="ai-tool-card" onClick={() => handleTriggerAiAction("enhance")}>
-                            <div className="ai-card-icon-box" style={{ background: "rgba(6,182,212,0.15)", border: "1px solid rgba(6,182,212,0.3)", color: "#06b6d4" }}>
-                              <Sun size={16} />
-                            </div>
-                            <div className="ai-card-info">
-                              <div className="ai-card-title">Enhance Photos</div>
-                              <div className="ai-card-desc">Auto improve lighting, contrast, and vivid colors</div>
-                            </div>
-                          </div>
-
-                          <div className="ai-tool-card" onClick={() => handleTriggerAiAction("bg")}>
-                            <div className="ai-card-icon-box" style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#3b82f6" }}>
-                              <Scissors size={16} />
-                            </div>
-                            <div className="ai-card-info">
-                              <div className="ai-card-title">Remove Background</div>
-                              <div className="ai-card-desc">Isolate subject and add backdrop color</div>
-                            </div>
-                          </div>
-
-                          <div className="ai-tool-card" onClick={() => handleTriggerAiAction("hashtags")}>
-                            <div className="ai-card-icon-box" style={{ background: "rgba(236,72,153,0.15)", border: "1px solid rgba(236,72,153,0.3)", color: "#ec4899" }}>
-                              <Terminal size={16} />
-                            </div>
-                            <div className="ai-card-info">
-                              <div className="ai-card-title">Generate Hashtags</div>
-                              <div className="ai-card-desc">Trending relevant tags for high engagement</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* AI Suggestions Review Card */}
-                        {activeAiModal && aiSuggestions && (
-                          <div style={{ marginTop: 12, padding: 12, borderRadius: 10, background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.3)" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>AI Suggestions</span>
-                              <button onClick={() => setActiveAiModal(null)} style={{ background: "none", border: "none", color: "var(--text-faint)", cursor: "pointer" }}><X size={12} /></button>
+                        {activeAiModal === "captions" ? (
+                          <div className="ai-captions-view">
+                            {/* Top Back Navigation */}
+                            <div className="ai-captions-nav">
+                              <button className="ai-back-btn" onClick={() => setActiveAiModal(null)}>
+                                <ChevronLeft size={14} /> Back to AI Tools
+                              </button>
+                              <span className="ai-badge-model">Ollama Vision + Gemma 2</span>
                             </div>
 
-                            {activeAiModal === "captions" && (
-                              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                                {aiSuggestions.options?.map((opt: string, i: number) => (
-                                  <div key={i} style={{ fontSize: 11, color: "var(--text-secondary)", padding: 6, background: "rgba(0,0,0,0.3)", borderRadius: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <span>"{opt}"</span>
-                                    <button
-                                      className="copy-btn"
-                                      onClick={() => {
-                                        handleAddTextElement({ text: opt, font: "Caveat", size: 32 });
-                                        setActiveAiModal(null);
+                            {/* Section Header */}
+                            <div className="ai-captions-header">
+                              <div className="ai-captions-title-row">
+                                <div className="ai-captions-title">Context-Aware Captions</div>
+                              </div>
+                              <div className="ai-captions-subtitle">
+                                Analyzing all {activeSlide.photos.length} photos on Slide {activeSlideIndex + 1}
+                              </div>
+
+                              {/* Mini Photos Preview Strip */}
+                              <div className="ai-photos-preview-strip">
+                                {activeSlide.photos.map((p, idx) => (
+                                  <div key={`cap-strip-${p.id || idx}`} className="ai-strip-thumb" title={p.name || `Photo #${idx + 1}`}>
+                                    <img
+                                      src={p.url}
+                                      alt=""
+                                      onError={(e) => {
+                                        (e.currentTarget as HTMLImageElement).src = "/demo/demo1.jpg";
                                       }}
-                                    >
-                                      Apply
-                                    </button>
+                                    />
+                                    <span className="ai-strip-badge">{idx + 1}</span>
                                   </div>
                                 ))}
                               </div>
+                            </div>
+
+                            {/* Loading State */}
+                            {isGeneratingCaptions && (
+                              <div className="ai-captions-loading">
+                                <div className="ai-loading-spinner-wrap">
+                                  <RotateCw size={20} className="ai-spin-icon" />
+                                </div>
+                                <div className="ai-loading-step-text">{captionLoadingStep}</div>
+                                <div className="ai-loading-subtext">Examining combined mood, lighting & setting</div>
+                                <div className="ai-skeleton-stack">
+                                  {[1, 2, 3, 4, 5].map((n) => (
+                                    <div key={n} className="ai-caption-skeleton" />
+                                  ))}
+                                </div>
+                              </div>
                             )}
 
-                            {activeAiModal === "hashtags" && (
-                              <div>
-                                <div style={{ fontSize: 11, color: "var(--accent-violet-mid)", lineHeight: 1.6, marginBottom: 8 }}>
-                                  {aiSuggestions.tags?.join(" ")}
+                            {/* Error State */}
+                            {!isGeneratingCaptions && captionError && (
+                              <div className="ai-caption-error-box">
+                                <div className="ai-error-header">
+                                  <AlertCircle size={16} className="ai-error-icon" />
+                                  <span className="ai-error-title">AI Service Unavailable</span>
                                 </div>
+                                <p className="ai-error-desc">{captionError}</p>
                                 <button
-                                  className="copy-btn"
-                                  onClick={() => {
-                                    handleCopy(aiSuggestions.tags?.join(" "), "tags_copy");
-                                    setActiveAiModal(null);
-                                  }}
+                                  className="btn-retry"
+                                  onClick={() => handleGenerateCaptions(false)}
                                 >
-                                  Copy Tags
+                                  <RotateCw size={13} /> Retry Generation
                                 </button>
                               </div>
                             )}
 
-                            {activeAiModal === "layouts" && (
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                                {aiSuggestions.layouts?.map((l: LayoutPreset) => (
+                            {/* Captions Results State */}
+                            {!isGeneratingCaptions && !captionError && generatedCaptions.length === 5 && (
+                              <div className="ai-captions-results">
+                                {sceneSummary && (
+                                  <div className="ai-scene-summary-pill" title={sceneSummary}>
+                                    <span className="ai-summary-label">Scene Context:</span> {sceneSummary}
+                                  </div>
+                                )}
+
+                                <div className="ai-results-bar">
+                                  <span className="ai-results-count">5 Tailored Captions</span>
                                   <button
-                                    key={l.layout_id}
-                                    className="btn-ghost"
-                                    onClick={() => {
-                                      handleSelectPreset(l.layout_id);
-                                      setActiveAiModal(null);
-                                    }}
-                                    style={{ fontSize: 10, padding: 6 }}
+                                    className="ai-refresh-btn"
+                                    onClick={() => handleGenerateCaptions(true)}
+                                    disabled={isGeneratingCaptions}
+                                    title="Generate a new batch of 5 distinct captions without repeating recent ones"
                                   >
-                                    {l.name}
+                                    <RotateCw size={12} /> Refresh Batch
                                   </button>
-                                ))}
+                                </div>
+
+                                <div className="ai-caption-cards-list">
+                                  {generatedCaptions.map((cap, idx) => {
+                                    const isCopied = copiedCaptionIdx === idx;
+                                    const toneColors: Record<string, { bg: string; color: string; border: string }> = {
+                                      aesthetic: { bg: "rgba(168, 85, 247, 0.12)", color: "#c084fc", border: "rgba(168, 85, 247, 0.3)" },
+                                      witty: { bg: "rgba(59, 130, 246, 0.12)", color: "#60a5fa", border: "rgba(59, 130, 246, 0.3)" },
+                                      hinglish: { bg: "rgba(16, 185, 129, 0.12)", color: "#34d399", border: "rgba(16, 185, 129, 0.3)" },
+                                      story: { bg: "rgba(245, 158, 11, 0.12)", color: "#fbbf24", border: "rgba(245, 158, 11, 0.3)" },
+                                      punchy: { bg: "rgba(244, 63, 94, 0.12)", color: "#fb7185", border: "rgba(244, 63, 94, 0.3)" },
+                                    };
+                                    const style = toneColors[cap.tone] || toneColors.aesthetic;
+
+                                    return (
+                                      <div key={`gen-cap-${idx}`} className="caption-card-item">
+                                        <div className="caption-card-top">
+                                          <span
+                                            className="caption-tone-pill"
+                                            style={{ background: style.bg, color: style.color, borderColor: style.border }}
+                                          >
+                                            {cap.label || cap.tone}
+                                          </span>
+                                          <div className="caption-card-actions">
+                                            <button
+                                              className="caption-action-btn"
+                                              onClick={() => handleCopyCaption(cap.text, idx)}
+                                              title="Copy caption to clipboard"
+                                            >
+                                              {isCopied ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
+                                              <span>{isCopied ? "Copied" : "Copy"}</span>
+                                            </button>
+                                            <button
+                                              className="caption-action-btn caption-apply-btn"
+                                              onClick={() => handleApplyCaptionToCanvas(cap.text)}
+                                              title="Add as text layer to current slide"
+                                            >
+                                              <Plus size={12} />
+                                              <span>Add</span>
+                                            </button>
+                                          </div>
+                                        </div>
+                                        <div className="caption-card-body">
+                                          "{cap.text}"
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Empty State before first generation */}
+                            {!isGeneratingCaptions && !captionError && generatedCaptions.length === 0 && (
+                              <div className="ai-captions-empty">
+                                <p className="ai-empty-desc">
+                                  Analyze all images in this slide together to create five distinct, highly contextual captions matching their shared mood, lighting, and aesthetic.
+                                </p>
+                                <button
+                                  className="btn-primary"
+                                  style={{ width: "100%", justifyContent: "center", marginTop: 8 }}
+                                  onClick={() => handleGenerateCaptions(false)}
+                                  disabled={isGeneratingCaptions}
+                                >
+                                  <Sparkles size={14} /> Generate 5 Captions
+                                </button>
                               </div>
                             )}
                           </div>
+                        ) : (
+                          <>
+                            <div className="inspector-section-header">
+                              <span className="inspector-section-label">AI Studio Suite</span>
+                              <span className="inspector-section-meta">One-Click Actions</span>
+                            </div>
+
+                            <div className="ai-cards-stack">
+                              <div
+                                className="ai-tool-card"
+                                onClick={() => {
+                                  setActiveAiModal("captions");
+                                  if (generatedCaptions.length === 0 && !isGeneratingCaptions) {
+                                    handleGenerateCaptions(false);
+                                  }
+                                }}
+                              >
+                                <div className="ai-card-icon-box" style={{ background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)", color: "#a855f7" }}>
+                                  <Sparkles size={16} />
+                                </div>
+                                <div className="ai-card-info">
+                                  <div className="ai-card-title">Generate Captions</div>
+                                  <div className="ai-card-desc">
+                                    {generatedCaptions.length === 5
+                                      ? "5 tailored captions ready • Click to view"
+                                      : "Get creative captions tailored for this post"}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="ai-tool-card" onClick={() => handleTriggerAiAction("layouts")}>
+                                <div className="ai-card-icon-box" style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981" }}>
+                                  <Layout size={16} />
+                                </div>
+                                <div className="ai-card-info">
+                                  <div className="ai-card-title">Suggest Layouts</div>
+                                  <div className="ai-card-desc">Get alternative design variations for {activePreset.slots.length} photos</div>
+                                </div>
+                              </div>
+
+                              <div className="ai-tool-card" onClick={() => handleTriggerAiAction("enhance")}>
+                                <div className="ai-card-icon-box" style={{ background: "rgba(6,182,212,0.15)", border: "1px solid rgba(6,182,212,0.3)", color: "#06b6d4" }}>
+                                  <Sun size={16} />
+                                </div>
+                                <div className="ai-card-info">
+                                  <div className="ai-card-title">Enhance Photos</div>
+                                  <div className="ai-card-desc">Auto improve lighting, contrast, and vivid colors</div>
+                                </div>
+                              </div>
+
+                              <div className="ai-tool-card" onClick={() => handleTriggerAiAction("bg")}>
+                                <div className="ai-card-icon-box" style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#3b82f6" }}>
+                                  <Scissors size={16} />
+                                </div>
+                                <div className="ai-card-info">
+                                  <div className="ai-card-title">Remove Background</div>
+                                  <div className="ai-card-desc">Isolate subject and add backdrop color</div>
+                                </div>
+                              </div>
+
+                              <div className="ai-tool-card" onClick={() => handleTriggerAiAction("hashtags")}>
+                                <div className="ai-card-icon-box" style={{ background: "rgba(236,72,153,0.15)", border: "1px solid rgba(236,72,153,0.3)", color: "#ec4899" }}>
+                                  <Terminal size={16} />
+                                </div>
+                                <div className="ai-card-info">
+                                  <div className="ai-card-title">Generate Hashtags</div>
+                                  <div className="ai-card-desc">Trending relevant tags for high engagement</div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Other AI Modals (layouts, hashtags) */}
+                            {activeAiModal && aiSuggestions && (
+                              <div style={{ marginTop: 12, padding: 12, borderRadius: 10, background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.3)" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                                  <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>AI Suggestions</span>
+                                  <button onClick={() => setActiveAiModal(null)} style={{ background: "none", border: "none", color: "var(--text-faint)", cursor: "pointer" }}><X size={12} /></button>
+                                </div>
+
+                                {activeAiModal === "hashtags" && (
+                                  <div>
+                                    <div style={{ fontSize: 11, color: "var(--accent-violet-mid)", lineHeight: 1.6, marginBottom: 8 }}>
+                                      {aiSuggestions.tags?.join(" ")}
+                                    </div>
+                                    <button
+                                      className="copy-btn"
+                                      onClick={() => {
+                                        handleCopy(aiSuggestions.tags?.join(" "), "tags_copy");
+                                        setActiveAiModal(null);
+                                      }}
+                                    >
+                                      Copy Tags
+                                    </button>
+                                  </div>
+                                )}
+
+                                {activeAiModal === "layouts" && (
+                                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                                    {aiSuggestions.layouts?.map((l: LayoutPreset) => (
+                                      <button
+                                        key={l.layout_id}
+                                        className="btn-ghost"
+                                        onClick={() => {
+                                          handleSelectPreset(l.layout_id);
+                                          setActiveAiModal(null);
+                                        }}
+                                        style={{ fontSize: 10, padding: 6 }}
+                                      >
+                                        {l.name}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     )}
