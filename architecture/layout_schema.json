@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lazylens.local/schemas/layout.schema.json",
+  "title": "CanvasLayoutSchema",
+  "description": "Deterministic geometric layout specification for a 1080x1350 social media canvas.",
+  "type": "object",
+  "required": ["layout_id", "name", "canvas", "slots"],
+  "properties": {
+    "layout_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+$",
+      "description": "Unique identifier for the layout preset (e.g., 'grid_2x2', 'hero_top_3_sub')."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable label for the layout."
+    },
+    "canvas": {
+      "type": "object",
+      "required": ["width", "height", "background_color"],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "const": 1080,
+          "description": "Canvas width in pixels (fixed to 1080 for 4:5 Instagram Portrait)."
+        },
+        "height": {
+          "type": "integer",
+          "const": 1350,
+          "description": "Canvas height in pixels (fixed to 1350 for 4:5 Instagram Portrait)."
+        },
+        "background_color": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$",
+          "default": "#FFFFFF",
+          "description": "Hex color code for canvas background / spacing borders."
+        },
+        "outer_margin": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 24,
+          "description": "Outer boundary margin in pixels."
+        },
+        "gutter": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 16,
+          "description": "Spacing gap between adjacent photo slots in pixels."
+        }
+      },
+      "additionalProperties": false
+    },
+    "slots": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "description": "Deterministic coordinates for 2 to 4 image placements.",
+      "items": {
+        "type": "object",
+        "required": ["slot_index", "x", "y", "width", "height"],
+        "properties": {
+          "slot_index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3,
+            "description": "Zero-indexed slot position (0, 1, 2, 3) mapped to the frontend photo array."
+          },
+          "x": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1080,
+            "description": "X coordinate (pixels) of the top-left corner on the canvas."
+          },
+          "y": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1350,
+            "description": "Y coordinate (pixels) of the top-left corner on the canvas."
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1080,
+            "description": "Slot width in pixels."
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1350,
+            "description": "Slot height in pixels."
+          },
+          "fit_mode": {
+            "type": "string",
+            "enum": ["cover", "contain", "fill"],
+            "default": "cover",
+            "description": "Image scaling policy: 'cover' (scale & center crop), 'contain' (fit within box with letterboxing), 'fill' (stretch)."
+          },
+          "border_radius": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "Corner radius for rounded clips in pixels."
+          },
+          "scale": {
+            "type": "number",
+            "default": 1.0,
+            "description": "Interactive zoom/scale multiplier."
+          },
+          "offset_x": {
+            "type": "number",
+            "default": 0.0,
+            "description": "Interactive pan offset X in pixels."
+          },
+          "offset_y": {
+            "type": "number",
+            "default": 0.0,
+            "description": "Interactive pan offset Y in pixels."
+          },
+          "rotation": {
+            "type": "number",
+            "default": 0.0,
+            "description": "Slot rotation angle in degrees."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "category": {
+      "type": "string",
+      "description": "Preset category classification (e.g., 'Minimalist', 'Film', 'Editorial', 'Scrapbook', 'Polaroid')."
+    },
+    "sample_images": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Sample placeholder image URLs from Unsplash."
+    },
+    "sample_text": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Default text elements or blocks for layout typography."
+    },
+    "overlay": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["airdrop", "location_pill", "editorial_header", "torn_edges", "cinematic_subtitles", "none"]
+        },
+        "config": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
+

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lazylens.local/schemas/render_payload.schema.json",
+  "title": "RenderPayloadSchema",
+  "description": "Specification for the render request payload dispatched to the deterministic Python engine.",
+  "type": "object",
+  "required": ["request_id", "layout_id", "photos"],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Unique UUID or transaction ID for the render job."
+    },
+    "layout_id": {
+      "type": "string",
+      "description": "Identifier of the target preset layout (e.g., 'grid_2x2', 'hero_top_3_sub')."
+    },
+    "custom_layout": {
+      "$ref": "layout.schema.json",
+      "description": "Optional inline layout specification overriding layout_id."
+    },
+    "photos": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "description": "Ordered array of 4 photos corresponding directly to slot_index 0, 1, 2, 3.",
+      "items": {
+        "type": "object",
+        "required": ["slot_index", "temp_path"],
+        "properties": {
+          "slot_index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3,
+            "description": "Target slot index in the canvas layout."
+          },
+          "photo_id": {
+            "type": "string",
+            "description": "Client-side identifier for tracking and swapping state."
+          },
+          "temp_path": {
+            "type": "string",
+            "description": "Absolute or relative file path to the staged image in .tmp/ directory."
+          },
+          "original_filename": {
+            "type": "string",
+            "description": "Original file name uploaded by user."
+          },
+          "crop_focus": {
+            "type": "object",
+            "description": "Normalized focal point (0.0 to 1.0) for deterministic center-cropping.",
+            "properties": {
+              "x": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "default": 0.5
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "default": 0.5
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "output_options": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["JPEG", "PNG", "WEBP"],
+          "default": "JPEG"
+        },
+        "quality": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 95
+        },
+        "output_filename": {
+          "type": "string",
+          "description": "Target filename for the generated composition."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
