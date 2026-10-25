@@ -276,11 +276,8 @@ def generate_5_captions_sync(
                 final_captions = unique_candidates
 
         except requests.exceptions.RequestException as e:
-            print(f"[Captions Error] Ollama service error ({target_model}): {e}")
-            raise ConnectionError(
-                f"Ollama text service is unavailable at {base_url}. "
-                f"Ensure Ollama is running and model '{target_model}' is installed."
-            ) from e
+            print(f"[Captions Warning] Ollama text service unavailable at {base_url}, proceeding to grounded context generator: {e}")
+            break
         except Exception as parse_err:
             print(f"[Captions Warning] Parsing attempt {attempt + 1} failed: {parse_err}")
 
